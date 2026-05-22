@@ -1,15 +1,35 @@
 \section{符号说明}
 
+文中用到的主要符号见表~\ref{tab:symbols}；局部使用的下标与上标
+在首次出现处另行说明。
+
 \begin{table}[H]
   \centering
   \caption{主要符号说明}
-  \begin{tabular}{cl}
+  \label{tab:symbols}
+  \begin{tabular}{cll}
     \toprule
-    符号 & 含义 \\
+    符号 & 含义 & 单位 \\
     \midrule
-    $x_i$ & 第 $i$ 个决策变量 \\
-    $f(x)$ & 目标函数 \\
-    $C$ & 约束集合 \\
+    $t$ & 调度时段索引（$t=1,2,\dots,24$） & --- \\
+    $s$ & 风光场景索引（$s=1,2,\dots,24$） & --- \\
+    $P^{\mathrm{wind}}_t,\ P^{\mathrm{pv}}_t$ & 风电、光伏发电功率 & MW \\
+    $P^{\mathrm{re}}_t = P^{\mathrm{wind}}_t + P^{\mathrm{pv}}_t$ & 新能源总发电功率 & MW \\
+    $P^{\mathrm{load}}_t$ & 园区常规电负荷 & MW \\
+    $P^{\mathrm{ALK}}_t,\ P^{\mathrm{PEM}}_t,\ P^{\mathrm{NH_3}}_t$ & 电氢氨装备运行功率 & MW \\
+    $P^{\mathrm{use}}_t$ & 园区内部用电总功率 & MW \\
+    $P^{\mathrm{buy}}_t,\ P^{\mathrm{sell}}_t$ & 网购、上网功率 & MW \\
+    $E^{\bullet}$ & 对应功率的 24~h 积分电量 & MWh \\
+    $E^{\mathrm{self}} = E^{\mathrm{re}} - E^{\mathrm{sell}}$ & 新能源自发自用电量 & MWh \\
+    $E^{\mathrm{total}} = E^{\mathrm{re}} + E^{\mathrm{buy}}$ & 总用电量（含上网，宽口径） & MWh \\
+    $\eta^{\mathrm{ALK}},\ \eta^{\mathrm{PEM}}$ & 电解槽效率 & --- \\
+    $c^{\mathrm{wind}},\ c^{\mathrm{pv}}$ & 风电、光伏度电平准化成本 & 元/kWh \\
+    $c^{\mathrm{buy}}_t$ & 第 $t$ 时段分时购电电价 & 元/kWh \\
+    $c^{\mathrm{sell}}$ & 余电上网电价（风光统一） & 元/kWh \\
+    $\mathrm{OPEX}^{i}$ & 装备 $i$ 的单位运维系数 & 元/kWh \\
+    $\Pi_{\mathrm{self}},\ \Pi_{\mathrm{green}},\ \Pi_{\mathrm{sell}}$ & 三项绿电直连指标 & --- \\
+    $C^{\mathrm{day}}$ & 日运行总成本 & 元 \\
+    $C^{\mathrm{NH_3}}$ & 吨氨成本 & 元/t \\
     \bottomrule
   \end{tabular}
 \end{table}

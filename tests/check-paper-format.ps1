@@ -6,7 +6,9 @@ $checks = @(
   @{ Name = 'cover registration label macro'; Pass = $main.Contains('\newcommand{\registrationLabel}') },
   @{ Name = 'old underlined cover fields removed'; Pass = -not $main.Contains('\underline{\makebox[8cm]') },
   @{ Name = 'references no toc entry'; Pass = -not $references.Contains('\addcontentsline{toc}') },
-  @{ Name = 'citation marker guidance'; Pass = $references.Contains('[1][3]') }
+  @{ Name = 'citation marker guidance'; Pass = $references.Contains('[1][3]') },
+  @{ Name = 'Times-like math font'; Pass = $main.Contains('\usepackage{newtxmath}') },
+  @{ Name = 'display math spacing'; Pass = $main.Contains('\setlength{\abovedisplayskip}') }
 )
 
 $failed = $checks | Where-Object { -not $_.Pass }

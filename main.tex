@@ -2,6 +2,7 @@
 
 \usepackage{geometry}
 \usepackage{amsmath,amssymb,amsfonts}
+\usepackage{newtxmath}
 \usepackage{booktabs}
 \usepackage{graphicx}
 \usepackage{float}
@@ -15,6 +16,10 @@
 \graphicspath{{figures/}}
 \setlength{\parindent}{2em}
 \setlength{\parskip}{0pt}
+\setlength{\abovedisplayskip}{0.6em plus 0.2em minus 0.1em}
+\setlength{\belowdisplayskip}{0.6em plus 0.2em minus 0.1em}
+\setlength{\abovedisplayshortskip}{0.35em plus 0.15em minus 0.1em}
+\setlength{\belowdisplayshortskip}{0.35em plus 0.15em minus 0.1em}
 \linespread{1.25}
 
 \hypersetup{
@@ -50,7 +55,7 @@
 \fancyfoot[C]{\thepage}
 \renewcommand{\headrulewidth}{0pt}
 
-\newcommand{\paperTitle}{论文题目}
+\newcommand{\paperTitle}{绿电直连型电氢氨园区优化运行}
 \newcommand{\registrationLabel}{参赛编号}
 \newcommand{\paperTitleLabel}{论文题目}
 \newcommand{\registrationNumber}{009842}
@@ -78,10 +83,11 @@
 \input{sections/problem-analysis}
 \input{sections/model-assumptions}
 \input{sections/symbols}
-\input{sections/model-building}
-\input{sections/model-solving}
-\input{sections/result-analysis}
-\input{sections/sensitivity}
+\input{sections/problem1}
+\input{sections/problem2}
+\input{sections/problem3}
+\input{sections/problem4}
+\input{sections/problem5}
 \input{sections/model-evaluation}
 \input{sections/conclusion}
 \input{sections/references}

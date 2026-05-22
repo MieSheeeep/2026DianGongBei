@@ -1,0 +1,159 @@
+\section{问题一：典型风光场景下运行指标核算}
+
+\subsection{模型建立}
+
+问题一要求在典型风光场景下核算园区固定运行方案的功率曲线、绿电
+直连指标与吨氨成本。设第 $t \in \{1,2,\dots,24\}$ 个时段园区新能源
+出力、内部用电、网购功率与上网功率分别为
+$P_t^{\mathrm{re}}$、$P_t^{\mathrm{use}}$、$P_t^{\mathrm{buy}}$
+和 $P_t^{\mathrm{sell}}$。忽略园区功率损耗后，电气节点满足
+\begin{equation}
+  P^{\mathrm{re}}_t + P^{\mathrm{buy}}_t \;=\; P^{\mathrm{use}}_t + P^{\mathrm{sell}}_t,
+  \qquad P^{\mathrm{buy}}_t \cdot P^{\mathrm{sell}}_t = 0,
+  \label{eq:power-balance}
+\end{equation}
+式~\eqref{eq:power-balance} 表示任一时段内园区供给侧与消纳侧的功率
+守恒。其中 $P^{\mathrm{re}}_t = P^{\mathrm{wind}}_t + P^{\mathrm{pv}}_t$
+为新能源总发电功率，
+$P^{\mathrm{use}}_t = P^{\mathrm{ALK}}_t + P^{\mathrm{PEM}}_t
++ P^{\mathrm{NH_3}}_t + P^{\mathrm{load}}_t$ 为园区内部用电功率。
+风、光与常规负荷功率均由设备额定容量和附件给定的标幺曲线相乘得到。
+
+问题一中电解槽与合成氨装置均按满负荷连续运行，园区负荷侧功率已知，
+故网购功率与上网功率可由每一时段的功率缺额直接确定：
+\begin{equation}
+  P_t^{\mathrm{buy}}
+  = \max\!\left\{P_t^{\mathrm{use}}-P_t^{\mathrm{re}},0\right\},
+  \qquad
+  P_t^{\mathrm{sell}}
+  = \max\!\left\{P_t^{\mathrm{re}}-P_t^{\mathrm{use}},0\right\}.
+  \label{eq:p1-grid-exchange}
+\end{equation}
+式~\eqref{eq:p1-grid-exchange} 将新能源余量映射为上网功率，将功率
+缺额映射为网购功率。因此，本问题不涉及生产时段选择与功率调节，
+而是以固定负荷方案作为后续优化问题的基线场景。
+
+新能源自发自用电量记为
+$E^{\mathrm{self}} = E^{\mathrm{re}} - E^{\mathrm{sell}}$。因此可以得到总用电量为
+$E^{\mathrm{total}} = E^{\mathrm{re}} + E^{\mathrm{buy}}
+= E^{\mathrm{self}} + E^{\mathrm{sell}} + E^{\mathrm{buy}}$。
+三项绿电直连指标分别刻画新能源就地消纳程度、园区用电绿电占比和
+新能源余电上网比例，其计算式为:
+\begin{align}
+  \Pi_{\mathrm{self}}
+  &= \frac{E^{\mathrm{self}}}{E^{\mathrm{re}}}, &
+  \Pi_{\mathrm{green}}
+  &= \frac{E^{\mathrm{self}}}{E^{\mathrm{total}}}, &
+  \Pi_{\mathrm{sell}}
+  &= \frac{E^{\mathrm{sell}}}{E^{\mathrm{re}}}.
+  \label{eq:indicators}
+\end{align}
+式~\eqref{eq:indicators} 分别反映新能源就地消纳、园区绿电使用程度
+和对公共电网反送电的约束。其中三项指标需要分别满足
+$\Pi_{\mathrm{self}} > 60\%$、$\Pi_{\mathrm{green}} > 30\%$、
+$\Pi_{\mathrm{sell}} < 20\%$。
+
+为进一步评价固定运行方案的经济性，将风电、光伏度电平准化成本，
+电氢氨装备运维费用，分时购电费用以及余电上网收入统一计入日运行
+成本；日运行成本除以当日制氨量即为吨氨成本：
+\begin{equation}
+  C^{\mathrm{NH_3}}
+  = \frac{
+        c^{\mathrm{wind}} E^{\mathrm{wind}}
+      + c^{\mathrm{pv}} E^{\mathrm{pv}}
+      + \sum\limits_{i\in\mathcal{D}} \mathrm{OPEX}^{i} E^{i}
+      + \sum\limits_{t=1}^{24} c^{\mathrm{buy}}_t P^{\mathrm{buy}}_t \Delta t
+      - c^{\mathrm{sell}} E^{\mathrm{sell}}
+    }{\sum\limits_{t=1}^{24} m^{\mathrm{NH_3}}_t \Delta t},
+  \label{eq:cost-nh3}
+\end{equation}
+式中，$\mathcal{D}$ 为计入运维成本的电氢氨设备集合，
+$c^{\mathrm{wind}}$、$c^{\mathrm{pv}}$ 分别表示风电与光伏度电平准化
+成本，$c_t^{\mathrm{buy}}$ 和 $c^{\mathrm{sell}}$ 分别表示分时购电
+电价与余电上网电价；余电上网收入以负成本形式抵扣日运行成本。
+
+在题设固定运行条件下，
+$P^{\mathrm{ALK}}_t \equiv P^{\mathrm{PEM}}_t \equiv 10$~MW、
+$P^{\mathrm{NH_3}}_t \equiv 0.75$~MW，制氨速率 $m^{\mathrm{NH_3}}_t
+\equiv 1.5$~t/h，因此园区典型日制氨量为 36~t。计算中取
+$\Delta t = 1$~h，风电与光伏度电平准化成本分别为
+0.15~元/kWh 和 0.12~元/kWh，余电上网电价为 0.3779~元/kWh，
+分时购电电价按附件 7 取值。
+
+\subsection{模型求解与结果}
+
+将附件 1、2 的典型日标幺曲线与设备额定容量相乘，并结合
+式~\eqref{eq:p1-grid-exchange} 逐时段核算，得到园区用电、风光出力
+以及电网交换功率曲线，如图~\ref{fig:p1-power} 所示。
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{p1_power_curves.pdf}
+  \caption{典型日园区用电、风光出力与电网交换功率}
+  \label{fig:p1-power}
+\end{figure}
+
+由图~\ref{fig:p1-power} 可见，风光出力在 10:00--14:00 进入高峰，
+总功率约为 60--65~MW，明显高于满负荷运行时约 24~MW 的园区用电
+功率，因此午间出现连续余电上网；在凌晨与傍晚低出力时段，风光功率
+不足以覆盖固定生产负荷，园区需从外部电网购电维持制氢氨装置运行。
+
+对各时段功率序列累积可得典型日各类电量，结果见
+表~\ref{tab:p1-energy}。在此基础上，依据式~\eqref{eq:indicators}
+计算三项绿电直连指标，结果与阈值要求的对比如
+图~\ref{fig:p1-indicator-thresholds} 所示；依据式~\eqref{eq:cost-nh3}
+得到成本构成与吨氨成本，如图~\ref{fig:p1-cost-breakdown} 所示。
+
+\begin{table}[H]
+  \centering
+  \caption{问题一典型日各类电量}
+  \label{tab:p1-energy}
+  \begin{tabular}{lc}
+    \toprule
+    电量 & 数值 (MWh) \\
+    \midrule
+    风电 $E^{\mathrm{wind}}$ & 245.05 \\
+    光伏 $E^{\mathrm{pv}}$ & 358.40 \\
+    新能源 $E^{\mathrm{re}}$ & 603.45 \\
+    常规电负荷 $E^{\mathrm{load}}$ & 60.72 \\
+    碱性电解槽 $E^{\mathrm{ALK}}$ & 240.00 \\
+    PEM 电解槽 $E^{\mathrm{PEM}}$ & 240.00 \\
+    合成氨装置 $E^{\mathrm{NH_3}}$ & 18.00 \\
+    园区内部用电 $E^{\mathrm{use}}$ & 558.72 \\
+    自发自用 $E^{\mathrm{self}}$ & 386.68 \\
+    网购 $E^{\mathrm{buy}}$ & 172.04 \\
+    上网 $E^{\mathrm{sell}}$ & 216.77 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.72\textwidth]{p1_indicator_thresholds.pdf}
+  \caption{问题一绿电直连指标与阈值要求对比}
+  \label{fig:p1-indicator-thresholds}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.82\textwidth]{p1_cost_breakdown.pdf}
+  \caption{问题一典型日成本构成与关键经济结果}
+  \label{fig:p1-cost-breakdown}
+\end{figure}
+
+由表~\ref{tab:p1-energy} 可知，典型日新能源发电量为 603.45~MWh，
+园区内部用电量为 558.72~MWh。由于风光出力与固定生产负荷在时序上
+并不匹配，园区在一天内同时发生 172.04~MWh 网购电与
+216.77~MWh 余电上网。进一步由图~\ref{fig:p1-indicator-thresholds}
+可见，
+固定运行方案下新能源自发自用比例与总用电绿电比例均满足要求，
+但新能源上网比例达到 $35.92\%$，超过 $20\%$ 上限。
+
+造成该结果的关键并非典型日总电量不足，而是风光出力的峰谷波动与
+电氢氨装置满负荷恒定用电之间存在时间错配：午间新能源功率远高于
+固定用电需求，额外功率只能上网；低出力时段又需依靠外部电网补足
+功率缺额。由图~\ref{fig:p1-cost-breakdown} 得，分时购电费用是典型日
+正成本中的最大组成部分，上网收入抵扣后日运行净成本为
+155\,604.16~元，折合吨氨成本为 \textbf{4\,322.34~元/t}。
+因此，问题一结果表明固定满负荷方案难以同时降低购电依赖与余电
+上网比例，后续需通过可调度生产提高新能源内部消纳能力。
