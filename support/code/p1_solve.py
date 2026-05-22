@@ -1,140 +1,153 @@
 """问题一：典型风光场景下绿电直连电氢氨园区运行指标分析。
 
-题设：电解槽与合成氨装置每日满负荷连续运行，不计园区功率损耗。
+执行：
+  python support/code/p1_solve.py
 
-执行：python support/code/p1_solve.py
 产出：
-  support/results/p1/p1_hourly_power.csv     每小时功率序列
-  support/results/p1/p1_summary.json         电量/指标/成本汇总
-  support/results/p1/p1_power_curves.png     4 条功率曲线（PNG）
-  figures/p1_power_curves.pdf                同图矢量版（论文用）
-  figures/p1_indicator_thresholds.pdf        绿电指标与阈值对比图
-  figures/p1_cost_breakdown.pdf              典型日成本构成图
+  support/results/p1/p1_hourly_power.csv
+  support/results/p1/p1_summary.json
+  figures/p1_power_curves.pdf
+  figures/p1_indicator_thresholds.pdf
+  figures/p1_cost_breakdown.pdf
 """
 
 from __future__ import annotations
 
+import csv
 import json
+import math
+import shutil
+import subprocess
+import sys
+import tempfile
 from pathlib import Path
 
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-from matplotlib import rcParams
-
-import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from config import (
-    WIND_CAPACITY_MW, PV_CAPACITY_MW, LOAD_PEAK_MW,
-    ALK_CAPACITY_MW, PEM_CAPACITY_MW, NH3_CAPACITY_MW,
-    NH3_RATE_TPH, ALK_H2_RATE_KGH, PEM_H2_RATE_KGH,
-    ALK_OPEX_YUAN_PER_KWH, PEM_OPEX_YUAN_PER_KWH, NH3_OPEX_YUAN_PER_KWH,
-    WIND_LCOE_YUAN_PER_KWH, PV_LCOE_YUAN_PER_KWH,
-    SELL_PRICE_YUAN_PER_KWH, buy_price_schedule,
+from config import (  # noqa: E402
+    ALK_CAPACITY_MW,
+    ALK_H2_RATE_KGH,
+    ALK_OPEX_YUAN_PER_KWH,
+    LOAD_PEAK_MW,
+    NH3_CAPACITY_MW,
+    NH3_OPEX_YUAN_PER_KWH,
+    NH3_RATE_TPH,
+    PEM_CAPACITY_MW,
+    PEM_H2_RATE_KGH,
+    PEM_OPEX_YUAN_PER_KWH,
+    PV_CAPACITY_MW,
+    PV_LCOE_YUAN_PER_KWH,
+    SELL_PRICE_YUAN_PER_KWH,
+    WIND_CAPACITY_MW,
+    WIND_LCOE_YUAN_PER_KWH,
+    buy_price_schedule,
 )
-from loaders import load_typical_load, load_typical_wind_pv
+from loaders import load_typical_load, load_typical_wind_pv  # noqa: E402
 
-# ---- 路径 ----
 HERE = Path(__file__).resolve().parent
+ROOT = HERE.parent.parent
 RESULT_DIR = HERE.parent / "results" / "p1"
-RESULT_DIR.mkdir(parents=True, exist_ok=True)
-FIG_DIR = HERE.parent.parent / "figures"
-FIG_DIR.mkdir(parents=True, exist_ok=True)
-
-# ---- matplotlib 中文 ----
-rcParams["font.sans-serif"] = ["Microsoft YaHei", "SimHei", "DejaVu Sans"]
-rcParams["axes.unicode_minus"] = False
-rcParams["pdf.fonttype"] = 42
-rcParams["ps.fonttype"] = 42
-rcParams["axes.titleweight"] = "semibold"
-rcParams["axes.titlesize"] = 10
-rcParams["axes.labelsize"] = 9
-rcParams["xtick.labelsize"] = 8
-rcParams["ytick.labelsize"] = 8
-rcParams["legend.fontsize"] = 8
+FIG_DIR = ROOT / "figures"
 
 
-def compute() -> dict:
-    # ---- 输入：标幺曲线 ----
+def _sum(values: list[float]) -> float:
+    return float(sum(values))
+
+
+def _fmt(value: float, digits: int = 2) -> str:
+    return f"{value:.{digits}f}"
+
+
+def _tex_escape(text: str) -> str:
+    return text.replace("%", r"\%").replace("_", r"\_")
+
+
+def compute() -> tuple[dict, list[dict[str, float]]]:
     load_pu = load_typical_load()
     wind_pu, pv_pu = load_typical_wind_pv()
+    buy_price = buy_price_schedule()
 
-    # ---- 功率序列（MW，长度 24） ----
-    p_load = load_pu * LOAD_PEAK_MW
-    p_wind = wind_pu * WIND_CAPACITY_MW
-    p_pv = pv_pu * PV_CAPACITY_MW
-    p_re = p_wind + p_pv
+    p_load = [value * LOAD_PEAK_MW for value in load_pu]
+    p_wind = [value * WIND_CAPACITY_MW for value in wind_pu]
+    p_pv = [value * PV_CAPACITY_MW for value in pv_pu]
+    p_re = [wind + pv for wind, pv in zip(p_wind, p_pv)]
+    p_alk = [ALK_CAPACITY_MW] * 24
+    p_pem = [PEM_CAPACITY_MW] * 24
+    p_nh3 = [NH3_CAPACITY_MW] * 24
+    p_use = [alk + pem + nh3 + load for alk, pem, nh3, load in zip(p_alk, p_pem, p_nh3, p_load)]
+    p_buy = [max(use - re, 0.0) for use, re in zip(p_use, p_re)]
+    p_sell = [max(re - use, 0.0) for use, re in zip(p_use, p_re)]
 
-    p_alk = np.full(24, ALK_CAPACITY_MW)
-    p_pem = np.full(24, PEM_CAPACITY_MW)
-    p_nh3 = np.full(24, NH3_CAPACITY_MW)
-    p_h2nh3 = p_alk + p_pem + p_nh3
-    p_use = p_h2nh3 + p_load                            # 园区内部用电
+    e_load = _sum(p_load)
+    e_wind = _sum(p_wind)
+    e_pv = _sum(p_pv)
+    e_re = _sum(p_re)
+    e_alk = _sum(p_alk)
+    e_pem = _sum(p_pem)
+    e_nh3 = _sum(p_nh3)
+    e_use = _sum(p_use)
+    e_buy = _sum(p_buy)
+    e_sell = _sum(p_sell)
+    e_self = e_re - e_sell
+    e_total = e_re + e_buy
 
-    delta = p_re - p_use
-    p_sell = np.maximum(delta, 0.0)
-    p_buy = -np.minimum(delta, 0.0)
-
-    # ---- 电量（MWh，dt = 1 h） ----
-    e_load = float(p_load.sum())
-    e_wind = float(p_wind.sum())
-    e_pv = float(p_pv.sum())
-    e_re = float(p_re.sum())
-    e_alk = float(p_alk.sum())
-    e_pem = float(p_pem.sum())
-    e_nh3 = float(p_nh3.sum())
-    e_use = float(p_use.sum())                          # 园区内部用电
-    e_sell = float(p_sell.sum())
-    e_buy = float(p_buy.sum())
-    e_self = e_re - e_sell                              # 自发自用
-
-    # ---- 绿电直连三项指标 ----
-    # 我们对"总用电量"采用"宽口径"：自用 + 网购 + 上网 = 风光 + 网购
-    # 这样指标 1 化简为 自用/风光；并与官方公式逐字对应。
-    e_total_wide = e_self + e_buy + e_sell              # = e_re + e_buy
-    ratio_self_use = e_self / e_re                      # >60%
-    ratio_green_wide = e_self / e_total_wide            # 宽口径 >30%
-    ratio_green_narrow = e_self / e_use                 # 窄口径（=自用/园区用电）
-    ratio_grid_sell = e_sell / e_re                     # <20%
-
-    # ---- 吨氨成本 ----
     nh3_tons = NH3_RATE_TPH * 24.0
     h2_kg = (ALK_H2_RATE_KGH + PEM_H2_RATE_KGH) * 24.0
 
-    buy_price = np.asarray(buy_price_schedule())        # 元/kWh
-    # 注意：功率单位 MW，dt 1 h => kWh = MW × 1000
-    cost_grid_buy = float((p_buy * 1000.0 * buy_price).sum())
-    revenue_grid_sell = float((p_sell * 1000.0 * SELL_PRICE_YUAN_PER_KWH).sum())
-
+    cost_wind = e_wind * 1000.0 * WIND_LCOE_YUAN_PER_KWH
+    cost_pv = e_pv * 1000.0 * PV_LCOE_YUAN_PER_KWH
     cost_opex = (
         e_alk * 1000.0 * ALK_OPEX_YUAN_PER_KWH
         + e_pem * 1000.0 * PEM_OPEX_YUAN_PER_KWH
         + e_nh3 * 1000.0 * NH3_OPEX_YUAN_PER_KWH
     )
-    cost_wind = e_wind * 1000.0 * WIND_LCOE_YUAN_PER_KWH
-    cost_pv = e_pv * 1000.0 * PV_LCOE_YUAN_PER_KWH
-
+    cost_grid_buy = sum(power * 1000.0 * price for power, price in zip(p_buy, buy_price))
+    revenue_grid_sell = e_sell * 1000.0 * SELL_PRICE_YUAN_PER_KWH
     net_cost = cost_wind + cost_pv + cost_opex + cost_grid_buy - revenue_grid_sell
-    cost_per_ton_nh3 = net_cost / nh3_tons
+
+    hourly_rows: list[dict[str, float]] = []
+    for hour in range(24):
+        hourly_rows.append(
+            {
+                "hour": hour,
+                "load_MW": p_load[hour],
+                "wind_MW": p_wind[hour],
+                "pv_MW": p_pv[hour],
+                "renewable_MW": p_re[hour],
+                "alk_MW": p_alk[hour],
+                "pem_MW": p_pem[hour],
+                "nh3_MW": p_nh3[hour],
+                "internal_use_MW": p_use[hour],
+                "grid_buy_MW": p_buy[hour],
+                "grid_sell_MW": p_sell[hour],
+                "buy_price_yuan_per_kwh": buy_price[hour],
+            }
+        )
 
     result = {
         "energy_MWh": {
-            "wind": e_wind, "pv": e_pv, "renewable": e_re,
-            "load": e_load, "alk": e_alk, "pem": e_pem, "nh3": e_nh3,
-            "internal_use": e_use, "self_use": e_self,
-            "grid_sell": e_sell, "grid_buy": e_buy,
-            "total_wide": e_total_wide,
+            "wind": e_wind,
+            "pv": e_pv,
+            "renewable": e_re,
+            "load": e_load,
+            "alk": e_alk,
+            "pem": e_pem,
+            "nh3": e_nh3,
+            "internal_use": e_use,
+            "self_use": e_self,
+            "grid_sell": e_sell,
+            "grid_buy": e_buy,
+            "total_wide": e_total,
         },
         "production": {
             "nh3_tons_per_day": nh3_tons,
             "h2_kg_per_day": h2_kg,
         },
         "indicators_pct": {
-            "self_use_ratio": ratio_self_use * 100,            # >60
-            "green_in_total_wide": ratio_green_wide * 100,     # >30 (宽)
-            "green_in_internal_use_narrow": ratio_green_narrow * 100,  # >30 (窄，参考)
-            "grid_sell_ratio": ratio_grid_sell * 100,          # <20
+            "self_use_ratio": e_self / e_re * 100.0,
+            "green_in_total_wide": e_self / e_total * 100.0,
+            "green_in_internal_use_narrow": e_self / e_use * 100.0,
+            "grid_sell_ratio": e_sell / e_re * 100.0,
         },
         "cost_yuan": {
             "wind_lcoe": cost_wind,
@@ -143,362 +156,168 @@ def compute() -> dict:
             "grid_buy": cost_grid_buy,
             "grid_sell_revenue": revenue_grid_sell,
             "net_total": net_cost,
-            "per_ton_nh3": cost_per_ton_nh3,
+            "per_ton_nh3": net_cost / nh3_tons,
         },
     }
+    return result, hourly_rows
 
-    df = pd.DataFrame({
-        "hour": np.arange(24),
-        "load_MW": p_load,
-        "wind_MW": p_wind,
-        "pv_MW": p_pv,
-        "renewable_MW": p_re,
-        "alk_MW": p_alk,
-        "pem_MW": p_pem,
-        "nh3_MW": p_nh3,
-        "internal_use_MW": p_use,
-        "grid_buy_MW": p_buy,
-        "grid_sell_MW": p_sell,
-        "buy_price_yuan_per_kwh": buy_price,
-    })
-    df.to_csv(RESULT_DIR / "p1_hourly_power.csv", index=False)
 
-    with open(RESULT_DIR / "p1_summary.json", "w", encoding="utf-8") as f:
+def write_outputs(result: dict, hourly_rows: list[dict[str, float]]) -> None:
+    RESULT_DIR.mkdir(parents=True, exist_ok=True)
+    FIG_DIR.mkdir(parents=True, exist_ok=True)
+    with (RESULT_DIR / "p1_hourly_power.csv").open("w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=list(hourly_rows[0].keys()))
+        writer.writeheader()
+        writer.writerows(hourly_rows)
+    with (RESULT_DIR / "p1_summary.json").open("w", encoding="utf-8") as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
 
-    return result
+
+def _plot_coordinates(rows: list[dict[str, float]], field: str, x0: float, y0: float, width: float, height: float, ymax: float) -> str:
+    points = []
+    for row in rows:
+        x = x0 + (row["hour"] + 0.5) / 24.0 * width
+        y = y0 + row[field] / ymax * height
+        points.append(f"({x:.3f},{y:.3f})")
+    return " ".join(points)
 
 
-def _style_axes(ax: plt.Axes, *, grid_axis: str = "y") -> None:
-    ax.spines["top"].set_visible(False)
-    ax.spines["right"].set_visible(False)
-    ax.spines["left"].set_color("#444444")
-    ax.spines["bottom"].set_color("#444444")
-    ax.tick_params(colors="#222222", width=0.7, length=3)
-    ax.grid(True, axis=grid_axis, color="#D9DDE3", linewidth=0.6, alpha=0.9)
-    ax.set_axisbelow(True)
+def _latex_document(body: str, width_cm: float, height_cm: float) -> str:
+    _ = (width_cm, height_cm)
+    return rf"""\documentclass[tikz,border=2mm]{{standalone}}
+\usepackage{{ctex}}
+\usepackage{{tikz}}
+\begin{{document}}
+\begin{{tikzpicture}}[x=1cm,y=1cm]
+{body}
+\end{{tikzpicture}}
+\end{{document}}
+"""
 
 
-def plot_power_curves() -> None:
-    df = pd.read_csv(RESULT_DIR / "p1_hourly_power.csv")
-    h_mid = df["hour"].to_numpy() + 0.5
-
-    # 论文风格：局部设置，不影响其他图
-    with plt.rc_context({
-        "font.family": ["Times New Roman", "SimSun"],
-        "axes.unicode_minus": False,
-        "axes.linewidth": 0.8,
-        "xtick.direction": "in",
-        "ytick.direction": "in",
-        "xtick.major.size": 3.5,
-        "ytick.major.size": 3.5,
-        "xtick.minor.size": 2.0,
-        "ytick.minor.size": 2.0,
-        "axes.labelsize": 10,
-        "xtick.labelsize": 9,
-        "ytick.labelsize": 9,
-        "legend.fontsize": 8.5,
-        "pdf.fonttype": 42,
-        "ps.fonttype": 42,
-    }):
-        fig, ax = plt.subplots(figsize=(6.6, 3.6))
-
-        # 低饱和、色盲友好配色 + 黑白打印可区分线型
-        curve_styles = [
-            {
-                "col": "internal_use_MW",
-                "label": "园区用电功率",
-                "color": "#2C5C8A",
-                "linestyle": "-",
-                "linewidth": 2.2,
-                "marker": "o",
-            },
-            {
-                "col": "renewable_MW",
-                "label": "风光发电功率",
-                "color": "#3B7F5C",
-                "linestyle": "-",
-                "linewidth": 2.2,
-                "marker": "s",
-            },
-            {
-                "col": "grid_buy_MW",
-                "label": "网购功率",
-                "color": "#A65E2E",
-                "linestyle": "--",
-                "linewidth": 1.8,
-                "marker": "^",
-            },
-            {
-                "col": "grid_sell_MW",
-                "label": "上网功率",
-                "color": "#6F5B9A",
-                "linestyle": "-.",
-                "linewidth": 1.8,
-                "marker": "D",
-            },
-        ]
-
-        for style in curve_styles:
-            ax.plot(
-                h_mid,
-                df[style["col"]],
-                label=style["label"],
-                color=style["color"],
-                linestyle=style["linestyle"],
-                linewidth=style["linewidth"],
-                marker=style["marker"],
-                markersize=3.2,
-                markerfacecolor="white",
-                markeredgewidth=0.8,
-                markevery=2,
-                solid_capstyle="round",
-                zorder=3,
-            )
-
-        ax.set_xlabel("时段 / h")
-        ax.set_ylabel("功率 / MW")
-        ax.set_xticks(range(0, 25, 2))
-        ax.set_xlim(0, 24)
-        ax.set_ylim(bottom=0)
-
-        _style_axes(ax)
-        ax.grid(True, which="major", axis="both", linewidth=0.45, alpha=0.28)
-        ax.set_axisbelow(True)
-        ax.spines["top"].set_visible(False)
-        ax.spines["right"].set_visible(False)
-        ax.legend(
-            loc="lower center",
-            bbox_to_anchor=(0.5, 1.02),
-            ncol=4,
-            frameon=False,
-            handlelength=2.4,
-            columnspacing=1.2,
-            borderaxespad=0.0,
+def _compile_pdf(tex_source: str, output_pdf: Path) -> None:
+    with tempfile.TemporaryDirectory(prefix="p1_fig_", dir=RESULT_DIR) as tmp_name:
+        tmp = Path(tmp_name)
+        tex_path = tmp / "figure.tex"
+        tex_path.write_text(tex_source, encoding="utf-8")
+        completed = subprocess.run(
+            ["xelatex", "-interaction=nonstopmode", "-halt-on-error", tex_path.name],
+            cwd=tmp,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            check=False,
         )
+        if completed.returncode != 0:
+            raise RuntimeError(completed.stdout)
+        shutil.copyfile(tmp / "figure.pdf", output_pdf)
 
-        fig.tight_layout(rect=[0, 0, 1, 0.93])
-        fig.savefig(RESULT_DIR / "p1_power_curves.png", dpi=300, bbox_inches="tight")
-        fig.savefig(FIG_DIR / "p1_power_curves.pdf", bbox_inches="tight")
-        plt.close(fig)
+
+def plot_power_curves(rows: list[dict[str, float]]) -> None:
+    x0, y0, width, height, ymax = 1.2, 1.0, 13.2, 5.3, 70.0
+    curves = [
+        ("internal_use_MW", "园区用电功率", "blue!70!black", "solid"),
+        ("renewable_MW", "风光发电功率", "green!55!black", "solid"),
+        ("grid_buy_MW", "网购功率", "orange!80!black", "dashed"),
+        ("grid_sell_MW", "上网功率", "purple!75!black", "dash dot"),
+    ]
+    parts = [
+        r"\definecolor{gridgray}{RGB}{214,219,225}",
+        rf"\draw[->,line width=0.45pt] ({x0},{y0}) -- ({x0 + width + 0.35},{y0}) node[right]{{时段/h}};",
+        rf"\draw[->,line width=0.45pt] ({x0},{y0}) -- ({x0},{y0 + height + 0.35});",
+        rf"\node[anchor=east] at ({x0 - 0.18:.3f},{y0 + height + 0.58:.3f}) {{功率/MW}};",
+    ]
+    for tick in range(0, 71, 10):
+        y = y0 + tick / ymax * height
+        parts.append(rf"\draw[gridgray,line width=0.25pt] ({x0},{y:.3f}) -- ({x0 + width},{y:.3f});")
+        if tick % 20 == 0:
+            parts.append(rf"\node[left] at ({x0 - 0.08},{y:.3f}) {{{tick}}};")
+    for tick in range(0, 25, 2):
+        x = x0 + tick / 24.0 * width
+        parts.append(rf"\draw ({x:.3f},{y0}) -- ({x:.3f},{y0 - 0.06}) node[below]{{{tick}}};")
+    for field, label, color, style in curves:
+        parts.append(rf"\draw[{color},line width=0.8pt,{style}] plot coordinates {{{_plot_coordinates(rows, field, x0, y0, width, height, ymax)}}};")
+    for idx, (_, label, color, style) in enumerate(curves):
+        x = x0 + 1.15 + idx * 3.10
+        y = y0 + height + 0.85
+        parts.append(rf"\draw[{color},line width=0.8pt,{style}] ({x:.3f},{y:.3f}) -- ({x + 0.65:.3f},{y:.3f});")
+        parts.append(rf"\node[right] at ({x + 0.72:.3f},{y:.3f}) {{{label}}};")
+    _compile_pdf(_latex_document("\n".join(parts), 15.8, 7.6), FIG_DIR / "p1_power_curves.pdf")
 
 
 def plot_indicator_thresholds(result: dict) -> None:
-    labels = ["新能源自发\n自用比例", "总用电\n绿电比例", "新能源\n上网比例"]
-    values = np.array([
+    values = [
         result["indicators_pct"]["self_use_ratio"],
         result["indicators_pct"]["green_in_total_wide"],
         result["indicators_pct"]["grid_sell_ratio"],
-    ])
-    thresholds = np.array([60.0, 30.0, 20.0])
-    threshold_notes = ["> 60%", "> 30%", "< 20%"]
-    passed = np.array([
-        values[0] > thresholds[0],
-        values[1] > thresholds[1],
-        values[2] < thresholds[2],
-    ])
-
-    x = np.arange(len(labels))
-    width = 0.50
-
-    pass_fill = "#8FA9C7"
-    fail_fill = "#D97C74"
-    edge = "#2B2B2B"
-    threshold_color = "#3A3A3A"
-    text_main = "#222222"
-    text_sub = "#5A5A5A"
-    grid_color = "#D9D9D9"
-    fills = [pass_fill if ok else fail_fill for ok in passed]
-
-    with plt.rc_context({
-        "font.family": ["Times New Roman", "SimSun"],
-        "axes.unicode_minus": False,
-        "axes.linewidth": 0.85,
-        "xtick.direction": "out",
-        "ytick.direction": "out",
-        "xtick.major.size": 0.0,
-        "ytick.major.size": 3.2,
-        "axes.labelsize": 10.5,
-        "xtick.labelsize": 9.5,
-        "ytick.labelsize": 9.5,
-        "pdf.fonttype": 42,
-        "ps.fonttype": 42,
-        "hatch.linewidth": 0.8,
-    }):
-        fig, ax = plt.subplots(figsize=(5.8, 3.25))
-        bars = ax.bar(
-            x,
-            values,
-            width=width,
-            color=fills,
-            edgecolor=edge,
-            linewidth=0.9,
-            zorder=3,
-        )
-        for idx, bar in enumerate(bars):
-            if not passed[idx]:
-                bar.set_hatch("//")
-
-        for idx, (value, threshold, note, ok) in enumerate(zip(values, thresholds, threshold_notes, passed)):
-            ax.hlines(
-                y=threshold,
-                xmin=idx - width * 0.55,
-                xmax=idx + width * 0.55,
-                colors=threshold_color,
-                linewidth=1.0,
-                linestyles=(0, (4, 2)),
-                zorder=4,
-            )
-            ax.plot(
-                idx + width * 0.62,
-                threshold,
-                marker="o",
-                markersize=4.2,
-                markerfacecolor="white",
-                markeredgecolor=threshold_color,
-                markeredgewidth=0.95,
-                zorder=5,
-            )
-            ax.text(
-                idx,
-                value + 2.0,
-                f"{value:.1f}%",
-                ha="center",
-                va="bottom",
-                fontsize=10.0,
-                color=text_main,
-                fontweight="semibold",
-            )
-            ax.text(
-                idx + width * 0.72,
-                threshold + 0.1,
-                note,
-                ha="left",
-                va="bottom",
-                fontsize=8.2,
-                color=text_sub,
-            )
-            ax.text(
-                idx,
-                max(value - 5.0, 4.0),
-                "满足" if ok else "不满足",
-                ha="center",
-                va="top",
-                fontsize=8.2,
-                color="white",
-                fontweight="semibold",
-                bbox={
-                    "boxstyle": "round,pad=0.18",
-                    "facecolor": "#5F7896" if ok else "#B9655E",
-                    "edgecolor": "none",
-                    "alpha": 0.98,
-                },
-                zorder=6,
-            )
-
-        ax.set_ylabel("比例 / %")
-        ax.set_xticks(x, labels)
-        ax.set_ylim(0, 80)
-        ax.set_yticks(np.arange(0, 81, 20))
-        ax.grid(True, axis="y", linewidth=0.55, color=grid_color, alpha=0.85, zorder=0)
-        ax.set_axisbelow(True)
-        ax.spines["top"].set_visible(False)
-        ax.spines["right"].set_visible(False)
-        ax.spines["left"].set_linewidth(0.85)
-        ax.spines["bottom"].set_linewidth(0.85)
-        ax.text(
-            0.985,
-            0.965,
-            "○ 阈值要求",
-            transform=ax.transAxes,
-            ha="right",
-            va="top",
-            fontsize=8.0,
-            color=text_sub,
-        )
-        ax.margins(x=0.06)
-        fig.tight_layout(pad=0.85)
-        fig.savefig(FIG_DIR / "p1_indicator_thresholds.pdf", bbox_inches="tight")
-        plt.close(fig)
+    ]
+    labels = ["新能源自发\\\\自用比例", "总用电量\\\\绿电比例", "新能源上网\\\\电量比例"]
+    thresholds = [60.0, 30.0, 20.0]
+    directions = [">60\\%", ">30\\%", "<20\\%"]
+    passed = [values[0] > 60.0, values[1] > 30.0, values[2] < 20.0]
+    x0, y0, width, height, ymax = 1.0, 0.9, 10.5, 5.0, 80.0
+    bar_w = 1.25
+    parts = [
+        r"\definecolor{passblue}{RGB}{143,169,199}",
+        r"\definecolor{failred}{RGB}{217,124,116}",
+        r"\definecolor{gridgray}{RGB}{214,219,225}",
+        rf"\draw[->,line width=0.45pt] ({x0},{y0}) -- ({x0 + width + 0.25},{y0});",
+        rf"\draw[->,line width=0.45pt] ({x0},{y0}) -- ({x0},{y0 + height + 0.35}) node[above]{{比例/\%}};",
+    ]
+    for tick in range(0, 81, 20):
+        y = y0 + tick / ymax * height
+        parts.append(rf"\draw[gridgray,line width=0.25pt] ({x0},{y:.3f}) -- ({x0 + width},{y:.3f});")
+        parts.append(rf"\node[left] at ({x0 - 0.08},{y:.3f}) {{{tick}}};")
+    for i, (value, label, threshold, direction, ok) in enumerate(zip(values, labels, thresholds, directions, passed)):
+        cx = x0 + 1.45 + i * 3.35
+        y = y0 + value / ymax * height
+        ty = y0 + threshold / ymax * height
+        color = "passblue" if ok else "failred"
+        parts.append(rf"\filldraw[fill={color},draw=black,line width=0.35pt] ({cx - bar_w / 2:.3f},{y0}) rectangle ({cx + bar_w / 2:.3f},{y:.3f});")
+        parts.append(rf"\draw[dashed,line width=0.45pt] ({cx - 0.85:.3f},{ty:.3f}) -- ({cx + 0.85:.3f},{ty:.3f});")
+        parts.append(rf"\node[above] at ({cx:.3f},{y + 0.08:.3f}) {{{value:.1f}\%}};")
+        parts.append(rf"\node[right] at ({cx + 0.95:.3f},{ty:.3f}) {{{direction}}};")
+        parts.append(rf"\node[below,align=center] at ({cx:.3f},{y0 - 0.25:.3f}) {{{label}}};")
+        parts.append(rf"\node[white] at ({cx:.3f},{max(y0 + 0.35, y - 0.35):.3f}) {{{'满足' if ok else '不满足'}}};")
+    _compile_pdf(_latex_document("\n".join(parts), 12.5, 6.8), FIG_DIR / "p1_indicator_thresholds.pdf")
 
 
 def plot_cost_breakdown(result: dict) -> None:
     costs = result["cost_yuan"]
-    labels = ["风电度电成本", "光伏度电成本", "装备运维", "分时购电"]
-    values = np.array([costs["wind_lcoe"], costs["pv_lcoe"], costs["device_opex"], costs["grid_buy"]])
-    colors = ["#2C5C8A", "#8FA9C7", "#3B7F5C", "#A65E2E"]
-    gross_cost = float(values.sum())
-
-    with plt.rc_context({
-        "font.family": ["Times New Roman", "SimSun"],
-        "axes.unicode_minus": False,
-        "axes.linewidth": 0.85,
-        "pdf.fonttype": 42,
-        "ps.fonttype": 42,
-        "legend.fontsize": 8.0,
-    }):
-        fig, (ax_pie, ax_note) = plt.subplots(
-            1, 2, figsize=(6.6, 3.1), gridspec_kw={"width_ratios": [1.12, 1.0]}
-        )
-        wedges, _ = ax_pie.pie(
-            values,
-            startangle=102,
-            colors=colors,
-            wedgeprops={"width": 0.46, "linewidth": 0.9, "edgecolor": "white"},
-        )
-        ax_pie.text(0, 0.08, "正成本", ha="center", va="center", fontsize=8.5, color="#5A5A5A")
-        ax_pie.text(
-            0,
-            -0.12,
-            f"{gross_cost / 10000:.2f} 万元",
-            ha="center",
-            va="center",
-            fontsize=10.2,
-            fontweight="semibold",
-            color="#222222",
-        )
-        shares = [f"{label}  {value / gross_cost:.1%}" for label, value in zip(labels, values)]
-        ax_pie.legend(
-            wedges,
-            shares,
-            loc="lower center",
-            bbox_to_anchor=(0.5, -0.20),
-            frameon=False,
-            ncol=1,
-            handlelength=1.15,
-            handletextpad=0.55,
-        )
-
-        ax_note.axis("off")
-        note_lines = [
-            ("余电上网收入抵扣", f"-{costs['grid_sell_revenue']:,.2f} 元"),
-            ("典型日运行净成本", f"{costs['net_total']:,.2f} 元"),
-            ("吨氨成本", f"{costs['per_ton_nh3']:,.2f} 元/t"),
-        ]
-        ax_note.text(0.02, 0.88, "成本结果", fontsize=9.2, fontweight="semibold", color="#222222")
-        ax_note.hlines(0.82, 0.02, 0.98, color="#D9D9D9", linewidth=0.8)
-        for row, (label, value) in enumerate(note_lines):
-            y = 0.64 - row * 0.22
-            ax_note.text(0.02, y, label, fontsize=8.2, color="#5A5A5A", va="center")
-            ax_note.text(
-                0.98,
-                y,
-                value,
-                fontsize=8.9,
-                color="#222222",
-                va="center",
-                ha="right",
-                fontweight="semibold" if row == 2 else "normal",
-            )
-        ax_note.set_xlim(0, 1)
-        ax_note.set_ylim(0, 1)
-        fig.tight_layout(pad=0.9)
-        fig.savefig(FIG_DIR / "p1_cost_breakdown.pdf", bbox_inches="tight")
-        plt.close(fig)
+    items = [
+        ("风电度电成本", costs["wind_lcoe"]),
+        ("光伏度电成本", costs["pv_lcoe"]),
+        ("装备运维", costs["device_opex"]),
+        ("分时购电", costs["grid_buy"]),
+    ]
+    gross = sum(value for _, value in items)
+    x0, y0, width, height = 1.0, 1.0, 10.8, 0.75
+    colors = ["blue!65!black", "blue!35", "green!55!black", "orange!80!black"]
+    parts = [
+        r"\node[anchor=west,font=\bfseries] at (1.0,5.8) {问题一典型日成本构成};",
+        rf"\node[anchor=west] at (1.0,5.25) {{正成本合计：{gross / 10000:.2f} 万元}};",
+    ]
+    current = x0
+    for (label, value), color in zip(items, colors):
+        w = value / gross * width
+        parts.append(rf"\filldraw[fill={color},draw=white,line width=0.4pt] ({current:.3f},{y0 + 3.35:.3f}) rectangle ({current + w:.3f},{y0 + 3.35 + height:.3f});")
+        parts.append(rf"\node[anchor=west] at (1.0,{4.1 - 0.42 * items.index((label, value)):.3f}) {{{label}：{value / 10000:.2f} 万元（{value / gross * 100:.1f}\%）}};")
+        current += w
+    notes = [
+        ("余电上网收入抵扣", -costs["grid_sell_revenue"]),
+        ("典型日运行净成本", costs["net_total"]),
+        ("吨氨成本", costs["per_ton_nh3"]),
+    ]
+    for idx, (label, value) in enumerate(notes):
+        y = 2.35 - idx * 0.48
+        unit = "元/t" if label == "吨氨成本" else "元"
+        parts.append(rf"\node[anchor=west] at (1.0,{y:.3f}) {{{label}}};")
+        parts.append(rf"\node[anchor=east,font=\bfseries] at (11.8,{y:.3f}) {{{value:,.2f} {unit}}};")
+    _compile_pdf(_latex_document("\n".join(parts), 12.8, 6.4), FIG_DIR / "p1_cost_breakdown.pdf")
 
 
-def plot(result: dict) -> None:
-    plot_power_curves()
+def plot(result: dict, rows: list[dict[str, float]]) -> None:
+    plot_power_curves(rows)
     plot_indicator_thresholds(result)
     plot_cost_breakdown(result)
 
@@ -507,21 +326,14 @@ def print_report(result: dict) -> None:
     print("=" * 64)
     print("问题一：典型日满负荷连续运行")
     print("=" * 64)
-    print("\n[产量]")
-    for k, v in result["production"].items():
-        print(f"  {k:32s}: {v:12.3f}")
-    print("\n[电量 / MWh]")
-    for k, v in result["energy_MWh"].items():
-        print(f"  {k:32s}: {v:12.3f}")
-    print("\n[绿电指标 / %]")
-    for k, v in result["indicators_pct"].items():
-        print(f"  {k:32s}: {v:12.3f}")
-    print("\n[成本 / 元]")
-    for k, v in result["cost_yuan"].items():
-        print(f"  {k:32s}: {v:14.2f}")
+    for group, values in result.items():
+        print(f"\n[{group}]")
+        for key, value in values.items():
+            print(f"  {key:32s}: {value:14.4f}")
 
 
 if __name__ == "__main__":
-    r = compute()
-    plot(r)
-    print_report(r)
+    summary, rows = compute()
+    write_outputs(summary, rows)
+    plot(summary, rows)
+    print_report(summary)

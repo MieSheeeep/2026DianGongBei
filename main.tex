@@ -9,18 +9,28 @@
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{enumitem}
+\usepackage{setspace}
+\usepackage[numbers,sort&compress]{natbib}
 \usepackage{hyperref}
 \usepackage{fancyhdr}
 
 \geometry{top=2.5cm,bottom=2.5cm,left=2.5cm,right=2.5cm}
 \graphicspath{{figures/}}
+\setstretch{1.0}
 \setlength{\parindent}{2em}
-\setlength{\parskip}{0pt}
+\setlength{\parskip}{3pt plus 1pt minus 1pt}
+\setlength{\intextsep}{8pt plus 1pt minus 1pt}
+\setlength{\textfloatsep}{8pt plus 1pt minus 1pt}
+\setlength{\floatsep}{8pt plus 1pt minus 1pt}
 \setlength{\abovedisplayskip}{0.6em plus 0.2em minus 0.1em}
 \setlength{\belowdisplayskip}{0.6em plus 0.2em minus 0.1em}
 \setlength{\abovedisplayshortskip}{0.35em plus 0.15em minus 0.1em}
 \setlength{\belowdisplayshortskip}{0.35em plus 0.15em minus 0.1em}
-\linespread{1.25}
+
+\newcommand{\sectiontitlefont}{\heiti\fontsize{18bp}{25bp}\selectfont}
+\newcommand{\subsectiontitlefont}{\heiti\fontsize{14bp}{20bp}\selectfont}
+\newcommand{\subsubsectiontitlefont}{\heiti\fontsize{12bp}{17bp}\selectfont}
+\newcommand{\paragraphtitlefont}{\heiti\fontsize{12bp}{17bp}\selectfont}
 
 \hypersetup{
   colorlinks=true,
@@ -31,24 +41,79 @@
 
 \ctexset{
   section = {
-    format = \centering\heiti\zihao{3},
+    format = \centering\sectiontitlefont,
+    nameformat = \sectiontitlefont,
+    numberformat = \sectiontitlefont,
+    titleformat = \sectiontitlefont,
     name = {},
     number = \chinese{section},
-    aftername = \quad
+    aftername = \quad,
+    beforeskip = 22pt plus 2pt minus 2pt,
+    afterskip = 14pt plus 1pt minus 1pt
   },
   subsection = {
-    format = \heiti\zihao{4},
+    format = \raggedright\subsectiontitlefont,
+    nameformat = \subsectiontitlefont,
+    numberformat = \subsectiontitlefont,
+    titleformat = \subsectiontitlefont,
     name = {},
     number = \arabic{section}.\arabic{subsection},
-    aftername = \quad
+    aftername = \quad,
+    beforeskip = 12pt plus 1pt minus 1pt,
+    afterskip = 6pt plus 1pt minus 1pt
   },
   subsubsection = {
-    format = \heiti\zihao{-4},
+    format = \raggedright\subsubsectiontitlefont,
+    nameformat = \subsubsectiontitlefont,
+    numberformat = \subsubsectiontitlefont,
+    titleformat = \subsubsectiontitlefont,
     name = {},
     number = \arabic{section}.\arabic{subsection}.\arabic{subsubsection},
-    aftername = \quad
+    aftername = \quad,
+    beforeskip = 8pt plus 1pt minus 1pt,
+    afterskip = 4pt plus 1pt minus 1pt
+  },
+  paragraph = {
+    format = \raggedright\paragraphtitlefont,
+    nameformat = \paragraphtitlefont,
+    titleformat = \paragraphtitlefont,
+    name = {},
+    number = {},
+    aftername = {},
+    beforeskip = 6pt,
+    afterskip = 3pt
   }
 }
+
+\DeclareCaptionFont{captionkai}{\kaishu\zihao{-4}\setstretch{1.0}}
+\DeclareCaptionLabelFormat{tablecn}{表\thetable}
+\DeclareCaptionLabelFormat{figurecn}{图\thefigure}
+\captionsetup{
+  font = captionkai,
+  labelfont = captionkai,
+  labelsep = quad,
+  justification = centering
+}
+\captionsetup[figure]{
+  name = 图,
+  labelformat = figurecn,
+  position = bottom,
+  skip = 6pt,
+  belowskip = 8pt
+}
+\captionsetup[table]{
+  name = 表,
+  labelformat = tablecn,
+  position = top,
+  skip = 6pt,
+  belowskip = 8pt
+}
+
+\renewcommand{\bibsection}{\section*{参考文献}}
+\bibliographystyle{unsrtnat}
+
+\newcommand{\tablefont}{\songti\zihao{-4}}
+\newcommand{\tablehead}[1]{\heiti\zihao{-4}#1}
 
 \pagestyle{fancy}
 \fancyhf{}

@@ -7,9 +7,10 @@
   \centering
   \caption{主要符号说明}
   \label{tab:symbols}
+  \tablefont
   \begin{tabular}{cll}
     \toprule
-    符号 & 含义 & 单位 \\
+    \tablehead{符号} & \tablehead{含义} & \tablehead{单位} \\
     \midrule
     $t$ & 调度时段索引（$t=1,2,\dots,24$） & --- \\
     $s$ & 风光场景索引（$s=1,2,\dots,24$） & --- \\
@@ -21,7 +22,7 @@
     $P^{\mathrm{buy}}_t,\ P^{\mathrm{sell}}_t$ & 网购、上网功率 & MW \\
     $E^{\bullet}$ & 对应功率的 24~h 积分电量 & MWh \\
     $E^{\mathrm{self}} = E^{\mathrm{re}} - E^{\mathrm{sell}}$ & 新能源自发自用电量 & MWh \\
-    $E^{\mathrm{total}} = E^{\mathrm{re}} + E^{\mathrm{buy}}$ & 总用电量（含上网，宽口径） & MWh \\
+    $E^{\mathrm{total}} = E^{\mathrm{re}} + E^{\mathrm{buy}}$ & 题目指标口径总用电量 & MWh \\
     $\eta^{\mathrm{ALK}},\ \eta^{\mathrm{PEM}}$ & 电解槽效率 & --- \\
     $c^{\mathrm{wind}},\ c^{\mathrm{pv}}$ & 风电、光伏度电平准化成本 & 元/kWh \\
     $c^{\mathrm{buy}}_t$ & 第 $t$ 时段分时购电电价 & 元/kWh \\
