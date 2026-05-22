@@ -22,6 +22,11 @@
 \setlength{\textfloatsep}{8pt plus 1pt minus 1pt}
 \setlength{\floatsep}{8pt plus 1pt minus 1pt}
 
+\newcommand{\sectiontitlefont}{\heiti\fontsize{24bp}{31bp}\selectfont}
+\newcommand{\subsectiontitlefont}{\heiti\fontsize{14bp}{20bp}\selectfont}
+\newcommand{\subsubsectiontitlefont}{\heiti\fontsize{12bp}{17bp}\selectfont}
+\newcommand{\paragraphtitlefont}{\heiti\fontsize{12bp}{17bp}\selectfont}
+
 \hypersetup{
   colorlinks=true,
   linkcolor=black,
@@ -31,15 +36,21 @@
 
 \ctexset{
   section = {
-    format = \centering\heiti\zihao{2}\setstretch{1.15},
+    format = \centering\sectiontitlefont,
+    nameformat = \sectiontitlefont,
+    numberformat = \sectiontitlefont,
+    titleformat = \sectiontitlefont,
     name = {},
     number = \chinese{section},
     aftername = \quad,
-    beforeskip = 18pt plus 2pt minus 2pt,
-    afterskip = 12pt plus 1pt minus 1pt
+    beforeskip = 22pt plus 2pt minus 2pt,
+    afterskip = 14pt plus 1pt minus 1pt
   },
   subsection = {
-    format = \raggedright\heiti\zihao{4}\setstretch{1.10},
+    format = \raggedright\subsectiontitlefont,
+    nameformat = \subsectiontitlefont,
+    numberformat = \subsectiontitlefont,
+    titleformat = \subsectiontitlefont,
     name = {},
     number = \arabic{section}.\arabic{subsection},
     aftername = \quad,
@@ -47,7 +58,10 @@
     afterskip = 6pt plus 1pt minus 1pt
   },
   subsubsection = {
-    format = \raggedright\heiti\zihao{-4}\setstretch{1.05},
+    format = \raggedright\subsubsectiontitlefont,
+    nameformat = \subsubsectiontitlefont,
+    numberformat = \subsubsectiontitlefont,
+    titleformat = \subsubsectiontitlefont,
     name = {},
     number = \arabic{section}.\arabic{subsection}.\arabic{subsubsection},
     aftername = \quad,
@@ -55,7 +69,9 @@
     afterskip = 4pt plus 1pt minus 1pt
   },
   paragraph = {
-    format = \raggedright\heiti\zihao{-4},
+    format = \raggedright\paragraphtitlefont,
+    nameformat = \paragraphtitlefont,
+    titleformat = \paragraphtitlefont,
     name = {},
     number = {},
     aftername = {},
@@ -65,6 +81,8 @@
 }
 
 \DeclareCaptionFont{captionkai}{\kaishu\zihao{-4}\setstretch{1.0}}
+\DeclareCaptionLabelFormat{tablecn}{表\thetable}
+\DeclareCaptionLabelFormat{figurecn}{图\thefigure}
 \captionsetup{
   font = captionkai,
   labelfont = captionkai,
@@ -73,12 +91,14 @@
 }
 \captionsetup[figure]{
   name = 图,
+  labelformat = figurecn,
   position = bottom,
   skip = 6pt,
   belowskip = 8pt
 }
 \captionsetup[table]{
   name = 表,
+  labelformat = tablecn,
   position = top,
   skip = 6pt,
   belowskip = 8pt
