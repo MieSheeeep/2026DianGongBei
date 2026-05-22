@@ -8,14 +8,19 @@
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{enumitem}
+\usepackage{setspace}
+\usepackage[numbers,sort&compress]{natbib}
 \usepackage{hyperref}
 \usepackage{fancyhdr}
 
 \geometry{top=2.5cm,bottom=2.5cm,left=2.5cm,right=2.5cm}
 \graphicspath{{figures/}}
+\setstretch{1.0}
 \setlength{\parindent}{2em}
-\setlength{\parskip}{0pt}
-\linespread{1.25}
+\setlength{\parskip}{3pt plus 1pt minus 1pt}
+\setlength{\intextsep}{8pt plus 1pt minus 1pt}
+\setlength{\textfloatsep}{8pt plus 1pt minus 1pt}
+\setlength{\floatsep}{8pt plus 1pt minus 1pt}
 
 \hypersetup{
   colorlinks=true,
@@ -26,24 +31,63 @@
 
 \ctexset{
   section = {
-    format = \centering\heiti\zihao{3},
+    format = \centering\heiti\zihao{3}\setstretch{1.15},
     name = {},
     number = \chinese{section},
-    aftername = \quad
+    aftername = \quad,
+    beforeskip = 18pt plus 2pt minus 2pt,
+    afterskip = 12pt plus 1pt minus 1pt
   },
   subsection = {
-    format = \heiti\zihao{4},
+    format = \raggedright\heiti\zihao{4}\setstretch{1.10},
     name = {},
     number = \arabic{section}.\arabic{subsection},
-    aftername = \quad
+    aftername = \quad,
+    beforeskip = 12pt plus 1pt minus 1pt,
+    afterskip = 6pt plus 1pt minus 1pt
   },
   subsubsection = {
-    format = \heiti\zihao{-4},
+    format = \raggedright\heiti\zihao{-4}\setstretch{1.05},
     name = {},
     number = \arabic{section}.\arabic{subsection}.\arabic{subsubsection},
-    aftername = \quad
+    aftername = \quad,
+    beforeskip = 8pt plus 1pt minus 1pt,
+    afterskip = 4pt plus 1pt minus 1pt
+  },
+  paragraph = {
+    format = \raggedright\heiti\zihao{-4},
+    name = {},
+    number = {},
+    aftername = {},
+    beforeskip = 6pt,
+    afterskip = 3pt
   }
 }
+
+\DeclareCaptionFont{captionkai}{\kaishu\zihao{-4}\setstretch{1.0}}
+\captionsetup{
+  font = captionkai,
+  labelfont = captionkai,
+  labelsep = quad,
+  justification = centering
+}
+\captionsetup[figure]{
+  name = 图,
+  position = bottom,
+  skip = 6pt,
+  belowskip = 8pt
+}
+\captionsetup[table]{
+  name = 表,
+  position = top,
+  skip = 6pt,
+  belowskip = 8pt
+}
+\renewcommand{\bibsection}{\section*{参考文献}}
+\bibliographystyle{unsrtnat}
+
+\newcommand{\tablefont}{\songti\zihao{-5}}
+\newcommand{\tablehead}[1]{\heiti\zihao{-5}#1}
 
 \pagestyle{fancy}
 \fancyhf{}
