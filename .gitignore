@@ -13,3 +13,12 @@
 main.pdf
 support/*.zip
 support/*.rar
+
+# 支撑材料只保留在本地：题目原文、附件、自写代码、数据、中间结果
+# 仅追踪每个目录的 .gitkeep 占位
+support/code/*
+!support/code/.gitkeep
+support/data/*
+!support/data/.gitkeep
+support/results/*
+!support/results/.gitkeep
