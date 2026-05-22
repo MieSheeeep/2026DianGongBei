@@ -1,0 +1,35 @@
+{
+  "energy_MWh": {
+    "wind": 245.048,
+    "pv": 358.4,
+    "renewable": 603.448,
+    "load": 60.72,
+    "alk": 240.0,
+    "pem": 240.0,
+    "nh3": 18.0,
+    "internal_use": 558.72,
+    "self_use": 386.6762,
+    "grid_sell": 216.77179999999998,
+    "grid_buy": 172.04379999999998,
+    "total_wide": 775.4918
+  },
+  "production": {
+    "nh3_tons_per_day": 36.0,
+    "h2_kg_per_day": 7200.0
+  },
+  "indicators_pct": {
+    "self_use_ratio": 64.07779957842267,
+    "green_in_total_wide": 49.86206172650697,
+    "green_in_internal_use_narrow": 69.2075100229095,
+    "grid_sell_ratio": 35.92220042157733
+  },
+  "cost_yuan": {
+    "wind_lcoe": 36757.2,
+    "pv_lcoe": 43008.0,
+    "device_opex": 60036.0,
+    "grid_buy": 97721.02512,
+    "grid_sell_revenue": 81918.06322,
+    "net_total": 155604.1619,
+    "per_ton_nh3": 4322.337830555556
+  }
+}
