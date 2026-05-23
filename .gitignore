@@ -13,6 +13,15 @@
 main.pdf
 support/*.zip
 support/*.rar
+题目.md
+
+# Local Codex/agent helper files are workspace-specific.
+.codex/
+.agents/
+AGENTS.md
+
+# Generated preview image; paper uses the PDF figure.
+figures/p1_power_curves.png
 
 # Keep generated Python bytecode out of the shared support materials.
 __pycache__/
