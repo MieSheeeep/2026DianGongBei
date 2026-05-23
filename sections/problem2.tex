@@ -2,8 +2,264 @@
 
 \subsection{模型建立}
 
-% TODO
+问题二在问题一固定满负荷运行方案的基础上，将制氨产能扩容至
+72~t/d，并允许电氢氨装置在各小时全额开机或停机。扩容后装置满开
+状态下，ALK 电解槽、PEM 电解槽和合成氨装置功率分别为
+20~MW、20~MW 和 1.5~MW，满开制氨速率为 3~t/h。题设要求日产量
+从 72~t/d 按 9~t/d 递减至 36~t/d，因此产量集合为
+\[
+  \mathcal{Q}=\{72,63,54,45,36\}\ \mathrm{t/d},
+\]
+对应满开小时数分别为 24、21、18、15、12~h。问题二不引入储能，
+不采用连续功率调节，也不设置启停成本、爬坡约束或中间库存状态；
+园区仍为并网运行，新能源优先供给园区内部负荷，不足部分购电，
+余电上网。
 
-\subsection{模型求解与结果}
+对给定风光场景 $s$ 和目标日产量 $q\in\mathcal{Q}$，定义二元开机
+变量
+\[
+  u_{s,t}^{q}\in\{0,1\},\qquad t=1,2,\dots,24,
+\]
+其中 $u_{s,t}^{q}=1$ 表示第 $t$ 小时电氢氨装置满开，
+$u_{s,t}^{q}=0$ 表示停机。各设备功率和制氨量由开机状态直接决定：
+\begin{align}
+  P_{s,t}^{\mathrm{ALK},q} &= 20u_{s,t}^{q},&
+  P_{s,t}^{\mathrm{PEM},q} &= 20u_{s,t}^{q},&
+  P_{s,t}^{\mathrm{NH_3},q} &= 1.5u_{s,t}^{q},&
+  m_{s,t}^{\mathrm{NH_3},q} &= 3u_{s,t}^{q}.
+  \label{eq:p2-device-power}
+\end{align}
+日产量约束为
+\begin{equation}
+  \sum_{t=1}^{24} m_{s,t}^{\mathrm{NH_3},q}=q,
+  \qquad\text{即}\qquad
+  \sum_{t=1}^{24} u_{s,t}^{q}=\frac{q}{3}.
+  \label{eq:p2-production-constraint}
+\end{equation}
 
-% TODO
+园区逐时内部用电功率为
+\begin{equation}
+  P_{s,t}^{\mathrm{use},q}
+  = P_{s,t}^{\mathrm{load}}
+  + P_{s,t}^{\mathrm{ALK},q}
+  + P_{s,t}^{\mathrm{PEM},q}
+  + P_{s,t}^{\mathrm{NH_3},q}.
+  \label{eq:p2-use-power}
+\end{equation}
+在并网条件下，购电功率和上网功率由新能源功率与内部用电功率的
+差额确定：
+\begin{equation}
+  P_{s,t}^{\mathrm{buy},q}
+  = \max\!\left\{P_{s,t}^{\mathrm{use},q}-P_{s,t}^{\mathrm{re}},0\right\},
+  \qquad
+  P_{s,t}^{\mathrm{sell},q}
+  = \max\!\left\{P_{s,t}^{\mathrm{re}}-P_{s,t}^{\mathrm{use},q},0\right\}.
+  \label{eq:p2-grid-exchange}
+\end{equation}
+由式~\eqref{eq:p2-grid-exchange} 可知，每小时均满足
+$P_{s,t}^{\mathrm{re}}+P_{s,t}^{\mathrm{buy},q}
+=P_{s,t}^{\mathrm{use},q}+P_{s,t}^{\mathrm{sell},q}$，
+且不会同时购电和售电。
+
+日运行经济性以净成本衡量。设 $c_t^{\mathrm{buy}}$ 为分时购电电价，
+$c^{\mathrm{sell}}$ 为余电上网电价，$c^{\mathrm{wind}}$、
+$c^{\mathrm{pv}}$ 为风电、光伏度电平准化成本，$\mathrm{OPEX}^i$
+为设备 $i$ 的运维系数，则日总支出、售电收入和日净成本分别为
+\begin{align}
+  C_{s,q}^{\mathrm{cost}}
+  &=10^3\!\left(
+      c^{\mathrm{wind}}E_{s}^{\mathrm{wind}}
+      +c^{\mathrm{pv}}E_{s}^{\mathrm{pv}}
+      +\sum_{i\in\{\mathrm{ALK},\mathrm{PEM},\mathrm{NH_3}\}}
+        \mathrm{OPEX}^{i}E_{s,q}^{i}
+      +\sum_{t=1}^{24}c_t^{\mathrm{buy}}
+        P_{s,t}^{\mathrm{buy},q}\Delta t
+    \right), \\
+  R_{s,q}^{\mathrm{sell}}
+  &=10^3c^{\mathrm{sell}}E_{s,q}^{\mathrm{sell}},\\
+  C_{s,q}^{\mathrm{net}}
+  &=C_{s,q}^{\mathrm{cost}}-R_{s,q}^{\mathrm{sell}}.
+  \label{eq:p2-cost}
+\end{align}
+其中电量以 MWh 计，电价和运维系数以元/kWh 计，因此式中使用
+$10^3$ 进行单位换算。计算结果文件中的 \texttt{cost\_yuan} 表示
+不扣除售电收入的非负支出，\texttt{sell\_revenue\_yuan} 表示上网
+收入，\texttt{net\_cost\_yuan} 表示两者相减后的净成本。优化目标为
+\begin{equation}
+  \min_{u_{s,t}^{q}} C_{s,q}^{\mathrm{net}},
+  \label{eq:p2-objective}
+\end{equation}
+吨氨成本为 $C_{s,q}^{\mathrm{net}}/q$。由于本问题没有启停成本、
+最小开停机时间、爬坡约束和跨时段库存状态，各小时之间不存在动态
+耦合；因此可计算每一小时由停机变为开机的净成本增量，并选取增量
+成本最低的 $q/3$ 个小时开机。该排序法与在
+\eqref{eq:p2-production-constraint} 约束下枚举二元开停机组合等价，
+能够得到全局最优。
+
+绿电直连指标沿用问题一的题目口径：
+\begin{equation}
+  E_{s,q}^{\mathrm{self}}
+  =E_{s}^{\mathrm{re}}-E_{s,q}^{\mathrm{sell}},\qquad
+  E_{s,q}^{\mathrm{total}}
+  =E_{s}^{\mathrm{re}}+E_{s,q}^{\mathrm{buy}}.
+  \label{eq:p2-energy-def}
+\end{equation}
+三项指标为
+\begin{equation}
+  \Pi_{\mathrm{self}}=\frac{E^{\mathrm{self}}}{E^{\mathrm{re}}},
+  \qquad
+  \Pi_{\mathrm{green}}=\frac{E^{\mathrm{self}}}{E^{\mathrm{total}}},
+  \qquad
+  \Pi_{\mathrm{sell}}=\frac{E^{\mathrm{sell}}}{E^{\mathrm{re}}},
+  \label{eq:p2-indicators}
+\end{equation}
+对应阈值为 $\Pi_{\mathrm{self}}>0.60$、
+$\Pi_{\mathrm{green}}>0.30$、$\Pi_{\mathrm{sell}}<0.20$。需强调的是，
+三项指标在问题二中作为运行效果评价指标输出，不作为净成本最小化的
+硬约束。
+
+\subsection{典型风光场景结果}
+
+依据式~\eqref{eq:p2-objective} 对典型风光场景下五个日产量档位分别
+求解，得到结果见表~\ref{tab:p2-typical-results}。典型场景最低吨氨
+成本方案的逐时运行状态如图~\ref{fig:p2-typical-schedule} 所示，
+不同日产量下吨氨成本对比如图~\ref{fig:p2-cost-by-production} 所示。
+
+\begin{table}[H]
+  \centering
+  \caption{问题二典型风光场景离散开停机优化结果}
+  \label{tab:p2-typical-results}
+  \tablefont
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{@{}cccccc@{}}
+    \toprule
+    \tablehead{日产量/(t/d)} & \tablehead{开机/h} & \tablehead{利用率}
+    & \tablehead{吨氨成本/(元/t)} & \tablehead{三项指标}
+    & \tablehead{达标情况} \\
+    \midrule
+    72 & 24 & 1.000 & 6219.14 & 0.9326/0.5128/0.0674 & 全满足 \\
+    63 & 21 & 0.875 & 5328.06 & 0.9217/0.5678/0.0783 & 全满足 \\
+    54 & 18 & 0.750 & 4591.27 & 0.9008/0.6265/0.0992 & 全满足 \\
+    45 & 15 & 0.625 & 3944.54 & 0.7549/0.5481/0.2451 & 部分满足 \\
+    36 & 12 & 0.500 & 3191.67 & 0.5525/0.4023/0.4475 & 部分满足 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{p2_typical_schedule.pdf}
+  \caption{问题二典型场景最低成本方案逐时运行结果}
+  \label{fig:p2-typical-schedule}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.82\textwidth]{p2_cost_by_production.pdf}
+  \caption{问题二不同日产量吨氨成本对比}
+  \label{fig:p2-cost-by-production}
+\end{figure}
+
+由表~\ref{tab:p2-typical-results} 可见，典型风光场景下吨氨成本随
+日产量降低而下降，其中 36~t/d 方案最低，为 3191.67~元/t。该方案
+选择 12 个小时满开，开机时段为
+0、1、2、3、4、5、6、9、11、12、14、23 时，设备利用率为
+0.500，与 $36/72$ 的产量比例一致。但该方案并非三项绿电直连指标
+全达标：新能源自发自用比例为 0.5525，低于 0.60；总用电量绿电比例
+为 0.4023，高于 0.30；新能源上网比例为 0.4475，高于 0.20 上限。
+相较之下，54、63、72~t/d 方案虽然吨氨成本更高，但典型场景下
+三项绿电指标均满足要求。
+
+这一结果说明，离散开停机优化在成本目标下倾向于把生产集中安排在
+净成本较低的时段；当日产量降至 36~t/d 时，装置只需开机半天，
+可以避开部分高购电成本时段，因此吨氨成本最低。但是低产量也降低了
+园区对风光电量的消纳能力，午间高出力时段仍有大量余电上网，导致
+自发自用比例和上网比例表现较弱。
+
+\subsection{24 种风光场景结果}
+
+进一步将附件 3 的 6 种风电场景与附件 4 的 4 种光伏场景组合，形成
+24 种风光日场景。对每个场景和每个日产量档位均按
+式~\eqref{eq:p2-objective} 独立求解，结果文件
+\texttt{p2\_daily\_cases.csv} 覆盖
+24 个场景 $\times$ 5 个产量档位，共 120 条日汇总记录；
+\texttt{p2\_hourly\_cases.csv} 覆盖相应的 2880 条逐时记录。全年统计
+时，每个风光场景代表 15 天，24 个场景合计折算为 360 天。
+
+固定日产量的全年折算结果见表~\ref{tab:p2-annual-results}。24 场景下
+三项绿电指标的分布如图~\ref{fig:p2-indicator-distribution} 所示，
+日购电量、日上网量与全年上网比例的变化如
+图~\ref{fig:p2-grid-exchange-distribution} 所示。
+
+\begin{table}[H]
+  \centering
+  \caption{问题二固定日产量全年折算结果}
+  \label{tab:p2-annual-results}
+  \tablefont
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabular}{@{}cccccccc@{}}
+    \toprule
+    \tablehead{日产量} & \tablehead{年产量} & \tablehead{吨氨成本}
+    & \tablehead{自发自用} & \tablehead{绿电比例} & \tablehead{上网比例}
+    & \tablehead{全满足} & \tablehead{部分/全不满足} \\
+    \tablehead{/(t/d)} & \tablehead{/t} & \tablehead{/(元/t)}
+    & & & & \tablehead{/d} & \tablehead{/d} \\
+    \midrule
+    72 & 25920 & 7182.67 & 0.9295 & 0.4058 & 0.0705 & 270 & 90/0 \\
+    63 & 22680 & 6523.27 & 0.8879 & 0.4288 & 0.1121 & 210 & 150/0 \\
+    54 & 19440 & 5909.66 & 0.8201 & 0.4370 & 0.1799 & 180 & 180/0 \\
+    45 & 16200 & 5290.32 & 0.6885 & 0.3942 & 0.3115 & 15 & 345/0 \\
+    36 & 12960 & 4493.82 & 0.5478 & 0.3369 & 0.4522 & 0 & 345/15 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.92\textwidth]{p2_indicator_distribution.pdf}
+  \caption{问题二 24 场景绿电直连指标分布}
+  \label{fig:p2-indicator-distribution}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{p2_grid_exchange_distribution.pdf}
+  \caption{问题二不同日产量日购电量与日上网量分布}
+  \label{fig:p2-grid-exchange-distribution}
+\end{figure}
+
+由表~\ref{tab:p2-annual-results} 可见，固定 72、63、54~t/d 运行时，
+全年上网比例分别为 0.0705、0.1121、0.1799，均低于 0.20；同时
+自发自用比例也保持在 0.8201 以上。但随着日产量降至 45~t/d 和
+36~t/d，全年上网比例分别升至 0.3115 和 0.4522，说明装置负荷降低后
+新能源就地消纳能力明显下降。另一方面，固定产量的全年吨氨成本随
+日产量降低而下降，36~t/d 固定方案为 4493.82~元/t，低于 72~t/d
+固定方案的 7182.67~元/t。
+
+若在每个风光场景内独立选择吨氨成本最低的日产量，当前 24 个场景
+均选择 36~t/d。因此推荐方案与固定 36~t/d 全年折算结果一致：
+年产量为 12960~t，年总净成本为 58\,239\,941.06~元，全年吨氨成本为
+4493.82~元/t。对应三项绿电直连指标为
+$\Pi_{\mathrm{self}}=0.5478$、
+$\Pi_{\mathrm{green}}=0.3369$、
+$\Pi_{\mathrm{sell}}=0.4522$；全年 360 天中，全满足天数为 0 天，
+部分满足天数为 345 天，全不满足天数为 15 天。推荐方案的吨氨成本
+场景分布见图~\ref{fig:p2-annual-unit-cost-distribution}。
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.82\textwidth]{p2_annual_unit_cost_distribution.pdf}
+  \caption{问题二推荐方案吨氨成本场景分布}
+  \label{fig:p2-annual-unit-cost-distribution}
+\end{figure}
+
+综合典型场景和 24 场景结果可以看出，成本最优与绿电指标最优之间
+存在明显冲突。低日产量方案能够把开机时段集中在低净成本小时，
+减少高价购电时段的生产负荷，因而吨氨成本最低；但负荷降低后，
+风光高出力时段可被园区吸收的电量减少，余电上网比例升高，自发自用
+比例下降。高日产量方案则相反，较高的生产负荷能够吸收更多风光
+电量，使上网比例下降、绿电指标改善，但需要覆盖更多低出力或高电价
+时段，购电支出和设备运行支出随之增加。由此可见，仅以日净成本为
+目标的离散开停机策略会偏向低负荷生产，若后续需要同时满足绿电直连
+指标，应在目标函数或约束中进一步引入指标达标要求，或进入问题三的
+连续功率调节模型提高风光消纳的时间匹配能力。
