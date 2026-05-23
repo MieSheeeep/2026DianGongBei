@@ -1,0 +1,16 @@
+#:schema https://developers.openai.com/codex/config-schema.json
+
+# 项目内默认允许读写工作区，但涉及越权、联网、危险命令时询问。
+sandbox_mode = "workspace-write"
+approval_policy = "on-request"
+
+# 数学建模任务通常需要多步推理。
+model_reasoning_effort = "high"
+
+# AGENTS.md 如果写得较详细，可以适当提高读取上限。
+project_doc_max_bytes = 65536
+
+[agents]
+max_threads = 4
+max_depth = 1
+job_max_runtime_seconds = 1800
