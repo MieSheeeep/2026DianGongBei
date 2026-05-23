@@ -1,0 +1,70 @@
+{
+  "renderer": "matplotlib",
+  "note": "Generated with matplotlib in the learn3.8 conda environment.",
+  "figures": [
+    {
+      "path": "figures/p2_typical_schedule.pdf",
+      "data_files": [
+        "support/results/p2/p2_typical_hourly.csv",
+        "support/results/p2/p2_summary.json"
+      ],
+      "description": "典型风光场景下最低吨氨成本方案的逐时功率与开停机状态。",
+      "key_findings": [
+        "最低吨氨成本方案为 36 t/d，开机 12 小时。",
+        "低产量方案成本较低，但余电上网功率在高出力时段更突出。"
+      ],
+      "recommended_for_paper": true
+    },
+    {
+      "path": "figures/p2_cost_by_production.pdf",
+      "data_files": [
+        "support/results/p2/p2_typical_daily.csv",
+        "support/results/p2/p2_summary.json"
+      ],
+      "description": "比较典型场景与24场景固定产量全年折算吨氨成本。",
+      "key_findings": [
+        "典型场景最低吨氨成本产量为 36 t/d。",
+        "固定产量全年折算中，36 t/d 吨氨成本最低。"
+      ],
+      "recommended_for_paper": true
+    },
+    {
+      "path": "figures/p2_indicator_distribution.pdf",
+      "data_files": [
+        "support/results/p2/p2_daily_cases.csv"
+      ],
+      "description": "24场景下三项官方绿电指标按产量分布，点为均值，误差线为最小-最大范围。",
+      "key_findings": [
+        "低产量方案上网比例明显偏高。",
+        "高产量方案自发自用比例和上网比例更容易达标，但吨氨成本更高。"
+      ],
+      "recommended_for_paper": true
+    },
+    {
+      "path": "figures/p2_annual_unit_cost_distribution.pdf",
+      "data_files": [
+        "support/results/p2/p2_daily_cases.csv",
+        "support/results/p2/p2_summary.json"
+      ],
+      "description": "24个场景推荐方案吨氨成本排序分布，每个场景代表15天。",
+      "key_findings": [
+        "推荐方案均选择 36 t/d。",
+        "推荐方案全年吨氨成本为 4493.82 元/t。"
+      ],
+      "recommended_for_paper": true
+    },
+    {
+      "path": "figures/p2_grid_exchange_distribution.pdf",
+      "data_files": [
+        "support/results/p2/p2_daily_cases.csv",
+        "support/results/p2/p2_summary.json"
+      ],
+      "description": "不同固定日产量下24场景平均日购电量、日上网量和全年上网比例对比。",
+      "key_findings": [
+        "低日产量方案购电量较低、成本较低，但平均日上网量和上网比例明显偏高。",
+        "高日产量方案更利于降低上网比例，但购电和吨氨成本增加。"
+      ],
+      "recommended_for_paper": true
+    }
+  ]
+}
