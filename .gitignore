@@ -13,7 +13,6 @@
 main.pdf
 support/*.zip
 support/*.rar
-题目.md
 
 # Local scratch agent skills are workspace-specific.
 .agents/
