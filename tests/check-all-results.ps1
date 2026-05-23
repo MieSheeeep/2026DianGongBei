@@ -12,11 +12,10 @@ $scripts = @(
 foreach ($script in $scripts) {
     if (Test-Path $script) {
         Write-Host "运行 $script" -ForegroundColor Cyan
-        Try {
-            pwsh -ExecutionPolicy Bypass -File $script
-        } Catch {
-            Write-Warning "脚本 $script 执行报错。这在未完成求解前是正常的。"
-        }
+        pwsh -ExecutionPolicy Bypass -File $script
+    }
+    else {
+        Write-Error "缺少检查脚本: $script"
     }
 }
 

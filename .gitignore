@@ -15,10 +15,8 @@ support/*.zip
 support/*.rar
 题目.md
 
-# Local Codex/agent helper files are workspace-specific.
-.codex/
+# Local scratch agent skills are workspace-specific.
 .agents/
-AGENTS.md
 
 # Generated preview image; paper uses the PDF figure.
 figures/p1_power_curves.png
