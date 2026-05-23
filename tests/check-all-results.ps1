@@ -3,6 +3,11 @@ $ErrorActionPreference = "Stop"
 
 Write-Host "检查全局结果汇总..."
 
+$runner = "powershell"
+if (Get-Command pwsh -ErrorAction SilentlyContinue) {
+    $runner = "pwsh"
+}
+
 $scripts = @(
     "tests/check-p2-results.ps1",
     "tests/check-p3-results.ps1",
@@ -12,7 +17,7 @@ $scripts = @(
 foreach ($script in $scripts) {
     if (Test-Path $script) {
         Write-Host "运行 $script" -ForegroundColor Cyan
-        pwsh -ExecutionPolicy Bypass -File $script
+        & $runner -ExecutionPolicy Bypass -File $script
     }
     else {
         Write-Error "缺少检查脚本: $script"
