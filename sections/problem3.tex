@@ -2,8 +2,157 @@
 
 \subsection{模型建立}
 
-% TODO
+问题三仍考虑 24 种风光组合出力场景，但将问题二中的离散开停机调度
+推广为连续功率调节。设 $\alpha_{t,s,q}$ 为场景 $s$、目标日产量 $q$
+下第 $t$ 个时段电氢氨装置的负荷率。根据题设，装置功率连续可调且下限为
+10\%，因此有
+\begin{equation}
+  0.1 \leq \alpha_{t,s,q} \leq 1,
+  \qquad t=1,2,\dots,24.
+  \label{eq:p3-alpha-bound}
+\end{equation}
+与问题二的二元变量 $u_{t,s,q}\in\{0,1\}$ 相比，式~\eqref{eq:p3-alpha-bound}
+允许装置在最低负荷和满负荷之间连续变化，从而更细粒度地匹配风光出力。
+
+扩容至 $72~\mathrm{t/d}$ 后，设备满负荷功率沿用问题二参数。连续调节下
+各设备功率和产氨速率表示为
+\begin{equation}
+  P_{t,s,q}^{\mathrm{ALK}}=20\alpha_{t,s,q},\quad
+  P_{t,s,q}^{\mathrm{PEM}}=20\alpha_{t,s,q},\quad
+  P_{t,s,q}^{\mathrm{NH_3}}=1.5\alpha_{t,s,q},\quad
+  m_{t,s,q}^{\mathrm{NH_3}}=3\alpha_{t,s,q}.
+  \label{eq:p3-device-power}
+\end{equation}
+因此，目标日产量约束为
+\begin{equation}
+  \sum_{t=1}^{24}3\alpha_{t,s,q}\Delta t=q,
+  \qquad \Delta t=1~\mathrm{h}.
+  \label{eq:p3-production}
+\end{equation}
+由于每小时至少以 10\% 负荷运行，任一方案均具有 $7.2~\mathrm{t/d}$
+的基础产量；其余产量由各时段负荷率的连续增量分配完成。
+
+园区内部用电功率为
+\begin{equation}
+  P_{t,s,q}^{\mathrm{use}}
+  =P_{t,s}^{\mathrm{load}}+41.5\alpha_{t,s,q}.
+  \label{eq:p3-use-power}
+\end{equation}
+购电功率和上网功率继续沿用问题一的功率平衡式~\eqref{eq:power-balance}
+以及正负缺额定义式~\eqref{eq:p1-grid-exchange}。同时，为明确同一小时不能
+既购电又售电，引入模式变量 $z_{t,s,q}\in\{0,1\}$，并设置
+\begin{equation}
+  0\leq P_{t,s,q}^{\mathrm{buy}}\leq Mz_{t,s,q},\qquad
+  0\leq P_{t,s,q}^{\mathrm{sell}}\leq M(1-z_{t,s,q}),
+  \label{eq:p3-grid-exclusive}
+\end{equation}
+其中 $M$ 为足够大的功率上界。式~\eqref{eq:p3-grid-exclusive} 保证任一时段
+内购电和售电至多发生一种。
+
+优化目标仍为最小化日运行净成本：
+\begin{equation}
+  \min C_{s,q}^{\mathrm{day}},
+  \label{eq:p3-objective}
+\end{equation}
+其中 $C_{s,q}^{\mathrm{day}}$ 的构成与问题二式~\eqref{eq:p2-day-cost}
+一致，包括风电和光伏度电成本、设备运维成本、分时购电费用以及余电上网
+收入抵扣。吨氨成本继续采用式~\eqref{eq:p2-unit-cost} 的口径计算。
+绿电直连指标则沿用问题一式~\eqref{eq:indicators}，并按全满足、部分满足、
+全不满足三类统计。
+
+从求解角度看，连续负荷率使各小时的可调空间可以在 $0.1$ 到 $1$ 之间连续分配。
+当
+\begin{equation}
+  \alpha_{t,s}^{0}
+  =\frac{P_{t,s}^{\mathrm{re}}-P_{t,s}^{\mathrm{load}}}{41.5}
+  \label{eq:p3-zero-exchange}
+\end{equation}
+落在 $[0.1,1]$ 内时，该负荷率对应本时段既不购电也不上网的临界状态。
+由于谷电价可能低于余电上网电价，简单地将各小时边际成本独立排序可能会破坏
+负荷率的连续路径。本文因此采用带买卖电互斥约束的混合整数线性规划求解，
+其目标函数、功率平衡和产量约束均为线性形式，能够直接得到连续调节下的全局最优方案。
 
 \subsection{模型求解与结果}
 
-% TODO
+对 24 种风光组合场景和五个目标日产量分别求解连续调节模型，并按每个场景代表
+15 天折算全年。表~\ref{tab:p3-annual-result} 给出了固定日产量口径下的全年结果。
+与问题二一致，$72~\mathrm{t/d}$ 方案因式~\eqref{eq:p3-production} 要求
+$\sum_t\alpha_t=24$，各时段均为满负荷运行，因此与问题二结果相同。
+在其他产量下，连续调节可在 24 小时内重新分配负荷率，使生产功率更贴近风光出力。
+
+\begin{table}[H]
+  \centering
+  \caption{问题三 24 场景全年折算下不同日产量的运行结果}
+  \label{tab:p3-annual-result}
+  \begin{tabular}{ccccc}
+    \toprule
+    日产量 & 吨氨成本 & 网购电量 & 上网电量 & 指标天数统计 \\
+    (t/d) & (元/t) & (MWh) & (MWh) & 全满足/部分/不满足 \\
+    \midrule
+    72 & 7182.67 & 221146.80 & 12078.72 & 270/90/0 \\
+    63 & 6413.13 & 176326.80 & 12078.72 & 300/60/0 \\
+    54 & 5663.95 & 137231.50 & 17803.42 & 240/120/0 \\
+    45 & 5008.76 & 109563.64 & 34955.56 & 240/120/0 \\
+    36 & 4209.48 & 91060.62 & 61272.54 & 165/195/0 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+从表~\ref{tab:p3-annual-result} 可见，若仅以吨氨成本最低为准，24 个场景下的
+推荐方案仍倾向于选择 $36~\mathrm{t/d}$。该方案全年折算制氨量为 12960~t，
+总净成本为 54\,554\,817.22~元，吨氨成本为 \textbf{4209.48~元/t}。
+其新能源自发自用比例为 $64.24\%$、总用电绿电比例为 $41.95\%$，
+均满足阈值；但新能源上网比例为 $35.76\%$，仍高于 $20\%$ 的要求。
+这说明连续调节显著改善了新能源消纳，但在低日产量下，受总产量需求限制，
+仍无法完全吸收高风光场景中的富余电量。
+
+图~\ref{fig:p3-dispatch-example} 给出了代表性场景 $W4\_P1$、日产量
+$36~\mathrm{t/d}$ 下的连续调度结果。可以看出，负荷率并非简单取 10\%
+或 100\%，而是在不同小时之间连续变化：风光出力较高或购电成本较低时段提高负荷，
+风光不足且购电成本较高时段降低负荷，从而同时压低购电量和上网量。
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.88\textwidth]{p3_dispatch_example.pdf}
+  \caption{问题三代表场景下连续负荷率调度与电网交换功率}
+  \label{fig:p3-dispatch-example}
+\end{figure}
+
+问题三与问题二的全年吨氨成本对比如图~\ref{fig:p3-cost-compare} 所示。
+除 $72~\mathrm{t/d}$ 因两种模型均为全天满负荷而结果相同外，其余产量下
+连续调节均降低了吨氨成本。其中 $36~\mathrm{t/d}$ 方案的吨氨成本由
+4493.82~元/t 降至 4209.48~元/t，下降 284.35~元/t；$45~\mathrm{t/d}$
+方案下降 281.55~元/t。成本降低的主要原因是连续负荷可以填补离散开停机
+留下的时序空隙，使部分原本上网的新能源转化为内部制氨用电，并减少后续高价
+时段的网购电量。
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.82\textwidth]{p3_cost_compare_p2.pdf}
+  \caption{问题二与问题三不同日产量下全年吨氨成本对比}
+  \label{fig:p3-cost-compare}
+\end{figure}
+
+以成本最低的 $36~\mathrm{t/d}$ 方案为例，问题三相较问题二的全年网购电量
+和余电上网量均减少 $1.62\times 10^4~\mathrm{MWh}$。对应三项绿电指标变化如图
+~\ref{fig:p3-indicator-compare} 所示：新能源自发自用比例提高 9.46 个百分点，
+总用电绿电比例提高 8.26 个百分点，上网比例降低 9.46 个百分点。
+这表明连续调节的主要价值不是改变总风光资源，而是改善风光出力与制氨负荷的
+时序匹配关系。
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.78\textwidth]{p3_indicator_compare_p2.pdf}
+  \caption{问题二与问题三成本最低方案的绿电直连指标对比}
+  \label{fig:p3-indicator-compare}
+\end{figure}
+
+综合来看，连续制氨调节相较离散开停机具有更强的消纳能力和经济性优势：
+一方面，低负荷运行下限保证装置全天维持基本生产；另一方面，连续负荷率又允许
+模型在新能源富余时段逐步提高功率，而不是被迫在停机和满负荷之间跳变。
+因此，问题三模型在大多数产量档位下同时降低了购电量、上网量和吨氨成本。
+不过，若要求三项绿电直连指标全部满足，单纯追求最低吨氨成本仍不充分；
+例如 $36~\mathrm{t/d}$ 方案虽然成本最低，但上网比例仍超限。若优先考虑指标合规，
+$54~\mathrm{t/d}$ 可作为更均衡的方案，其全年吨氨成本为 5663.95~元/t，
+自发自用比例为 $89.61\%$、总用电绿电比例为 $49.76\%$、上网比例为
+$10.39\%$，三项指标均满足要求。
