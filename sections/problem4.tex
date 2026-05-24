@@ -2,8 +2,182 @@
 
 \subsection{模型建立}
 
-% TODO
+问题四将园区由并网运行转为离网运行，此时外部电网不再提供功率缺额，
+园区用能完全受制于风光发电功率。与问题三相同，电氢氨装置运行时功率
+连续可调且最低稳定负荷为 10\%；但在离网且风光不足时，装置不能依靠电网
+维持最低负荷，因此允许停机。设 $\alpha_{t,s}$ 为场景 $s$ 下第 $t$ 小时
+制氨负荷率，则
+\begin{equation}
+  \alpha_{t,s}=0
+  \quad\text{或}\quad
+  0.1\leq\alpha_{t,s}\leq1.
+  \label{eq:p4-alpha}
+\end{equation}
+式~\eqref{eq:p4-alpha} 表示：若装置运行，则不得低于 10\% 负荷；
+若风光出力连最低稳定负荷也无法支撑，则该时段停机。
+
+无储能时，风光首先满足园区常规负荷，剩余功率用于制氨。记扩容后制氨
+系统满负荷用电功率为
+\begin{equation}
+  P^{\max}=20+20+1.5=41.5~\mathrm{MW}.
+  \label{eq:p4-pmax}
+\end{equation}
+在尽限利用风光发电条件下，负荷率按下式确定：
+\begin{equation}
+  \alpha_{t,s}=
+  \begin{cases}
+    0, &
+    P_{t,s}^{\mathrm{re}}-P_{t,s}^{\mathrm{load}} < 0.1P^{\max},\\[2mm]
+    \min\left\{1,\dfrac{P_{t,s}^{\mathrm{re}}-P_{t,s}^{\mathrm{load}}}{P^{\max}}\right\}, &
+    P_{t,s}^{\mathrm{re}}-P_{t,s}^{\mathrm{load}} \geq 0.1P^{\max}.
+  \end{cases}
+  \label{eq:p4-no-storage-alpha}
+\end{equation}
+对应弃电功率和常规负荷缺额为
+\begin{align}
+  P_{t,s}^{\mathrm{curtail}}
+  &=\max\left\{P_{t,s}^{\mathrm{re}}-P_{t,s}^{\mathrm{load}}
+  -P^{\max}\alpha_{t,s},0\right\},\\
+  P_{t,s}^{\mathrm{unserved}}
+  &=\max\left\{P_{t,s}^{\mathrm{load}}-P_{t,s}^{\mathrm{re}},0\right\}.
+  \label{eq:p4-curtail-unserved}
+\end{align}
+日产氨量为
+\begin{equation}
+  Q_s=\sum_{t=1}^{24}3\alpha_{t,s}.
+  \label{eq:p4-production}
+\end{equation}
+
+题面要求估算园区能源自治的最小风、光装机容量。本文将能源自治理解为：
+在不依赖外部电网的前提下，风光发电至少能够覆盖园区常规负荷。若采用风电和
+光伏等比例扩容，扩容倍数为 $k$，则
+\begin{equation}
+  k\left(P_{t,s}^{\mathrm{wind}}+P_{t,s}^{\mathrm{pv}}\right)
+  \geq P_{t,s}^{\mathrm{load}},\qquad \forall s,t.
+  \label{eq:p4-autonomy}
+\end{equation}
+由此可得最小等比例扩容倍数
+\begin{equation}
+  k_{\min}=
+  \max_{s,t}
+  \frac{P_{t,s}^{\mathrm{load}}}{P_{t,s}^{\mathrm{re}}}.
+  \label{eq:p4-kmin}
+\end{equation}
+该口径只保证园区常规负荷自治，不要求全时段满负荷制氨；后者会导致装机规模
+极端放大，不符合“最小自治容量”的估算目的。
+
+储能参与时，针对无储能结果中的最大弃电场景配置储能。引入充电功率
+$P_t^{\mathrm{ch}}$、放电功率 $P_t^{\mathrm{dis}}$、储能电量
+$E_t^{\mathrm{ess}}$、储能容量 $E^{\max}$ 和启停变量 $y_t$，有
+\begin{equation}
+  0.1y_t\leq\alpha_t\leq y_t,\qquad y_t\in\{0,1\}.
+  \label{eq:p4-run-status}
+\end{equation}
+离网功率平衡为
+\begin{equation}
+  P_t^{\mathrm{re}}+P_t^{\mathrm{dis}}+P_t^{\mathrm{unserved}}
+  =
+  P_t^{\mathrm{load}}+P^{\max}\alpha_t+P_t^{\mathrm{ch}}+P_t^{\mathrm{curtail}},
+  \label{eq:p4-storage-balance}
+\end{equation}
+储能状态方程为
+\begin{equation}
+  E_{t+1}^{\mathrm{ess}}
+  =(1-\lambda)E_t^{\mathrm{ess}}
+  +\eta_cP_t^{\mathrm{ch}}\Delta t
+  -\frac{P_t^{\mathrm{dis}}\Delta t}{\eta_d},
+  \qquad
+  0\leq E_t^{\mathrm{ess}}\leq E^{\max}.
+  \label{eq:p4-storage-state}
+\end{equation}
+其中 $\eta_c=\eta_d=0.9$，$\lambda=0.2\%$。储能容量配置采用两阶段优化：
+第一阶段最大化最大弃电场景下的日产氨量；第二阶段在保持该最大产量不变的
+前提下，最小化储能容量。该方法体现“产量优先、储能容量次优先”的配置原则。
+储能投资成本按使用寿命折算到日成本：
+\begin{equation}
+  C_{\mathrm{ESS}}^{\mathrm{day}}
+  =
+  \frac{1000\times1000E^{\max}}{15\times365}
+  +1000c_{\mathrm{ESS}}\sum_tP_t^{\mathrm{dis}}\Delta t,
+  \label{eq:p4-storage-cost}
+\end{equation}
+其中 $E^{\max}$ 单位为 MWh，储能运维系数 $c_{\mathrm{ESS}}=0.01$ 元/kWh。
 
 \subsection{模型求解与结果}
 
-% TODO
+首先计算无储能离网运行结果。原始风光装机下，24 个场景全年折算制氨总量为
+9781.56~t，年平均产能利用率为 $37.74\%$，全年弃电量为 14188.67~MWh。
+由于个别低出力时段风光甚至不能覆盖常规负荷，全年常规负荷缺额为
+8.29~MWh。由式~\eqref{eq:p4-kmin} 得到仅覆盖园区常规负荷的风光等比例
+扩容倍数为 $k_{\min}=1.0926$，对应风电装机约为 43.71~MW，光伏装机约为
+69.93~MW。
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.88\textwidth]{p4_offgrid_dispatch_example.pdf}
+  \caption{无储能离网条件下代表场景的风光利用与制氨负荷率}
+  \label{fig:p4-offgrid-dispatch}
+\end{figure}
+
+图~\ref{fig:p4-offgrid-dispatch} 展示了最大弃电场景 $W4\_P1$ 的无储能调度。
+当风光出力高于常规负荷和制氨满负荷需求时，制氨负荷率达到 1，剩余功率被弃电；
+当风光出力不足以支撑最低稳定负荷时，装置停机。这解释了离网条件下产能利用率
+显著低于并网情形的原因。
+
+无储能结果中，最大弃电场景为 $W4\_P1$。针对该场景进行储能两阶段优化，
+得到最优储能容量为 \textbf{154.97~MWh}。该容量下，$W4\_P1$ 场景日产氨量
+可达 56.45~t，储能日充电量为 173.71~MWh，日放电量为 138.40~MWh，
+弃电量降为 0。储能充放电和能量状态如图~\ref{fig:p4-storage-dispatch} 所示。
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.88\textwidth]{p4_storage_dispatch.pdf}
+  \caption{最大弃电场景下储能参与后的充放电与荷电状态}
+  \label{fig:p4-storage-dispatch}
+\end{figure}
+
+将上述储能容量固定并用于 24 个场景重新调度，全年折算制氨总量提高至
+$1.06\times10^4$~t，年平均产能利用率提高至 $40.99\%$，全年弃电量降为 0，
+常规负荷缺额也降为 0。各场景弃电量对比如图~\ref{fig:p4-curtailment} 所示。
+可以看出，储能主要吸收高风光场景中的富余电量，并在低出力时段释放，
+从而提高风光利用率和生产连续性。
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{p4_curtailment_by_scenario.pdf}
+  \caption{无储能与有储能离网运行下各场景日弃电量对比}
+  \label{fig:p4-curtailment}
+\end{figure}
+
+表~\ref{tab:p4-mode-compare} 比较了联网连续调节、离网无储能和离网有储能三种
+运行方式。联网连续调节复用问题三成本最低方案结果。离网无储能虽然吨氨成本较低，
+但存在常规负荷缺额，且全年制氨量明显低于联网方案；配置储能后，能源自给和风光
+利用率显著改善，但储能投资折算成本使吨氨成本上升。
+
+\begin{table}[H]
+  \centering
+  \caption{联网与离网运行方式的全年结果对比}
+  \label{tab:p4-mode-compare}
+  \begin{tabular}{lccc}
+    \toprule
+    运行方式 & 全年制氨量(t) & 吨氨成本(元/t) & 年产能利用率 \\
+    \midrule
+    联网连续调节 & 12960.00 & 4209.48 & 50.00\% \\
+    离网无储能 & 9781.56 & 4056.31 & 37.74\% \\
+    离网有储能 & 10623.83 & 4835.53 & 40.99\% \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.78\textwidth]{p4_mode_cost_compare.pdf}
+  \caption{联网与离网运行方式的吨氨成本和全年制氨量对比}
+  \label{fig:p4-mode-compare}
+\end{figure}
+
+综合来看，原始风光装机下离网运行可以实现部分能源自治，但受低出力时段制约，
+制氨产量和产能利用率下降。储能能够将高出力时段的弃电转移至低出力时段，
+消除弃电和常规负荷缺额，并提高全年制氨量；但由于储能容量较大，投资折算成本
+会抬高吨氨成本。联网方案在经济性和产量稳定性上仍具有优势，而离网储能方案的
+主要价值在于提升能源自治能力和风光发电利用水平。

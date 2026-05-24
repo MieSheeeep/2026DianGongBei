@@ -1,0 +1,83 @@
+{
+  "scenario_count": 24,
+  "annual_days": 360,
+  "alpha_rule": "alpha=0 or 0.1<=alpha<=1",
+  "autonomy_capacity": {
+    "criterion": "cover_regular_load_only",
+    "scale_factor": 1.092627,
+    "wind_capacity_MW": 43.705094,
+    "pv_capacity_MW": 69.92815
+  },
+  "storage_sizing": {
+    "scenario_id": "W4_P1",
+    "max_production_t": 56.450642,
+    "storage_capacity_MWh": 154.9716,
+    "daily": {
+      "scenario_id": "W4_P1",
+      "NH3_t_per_day": 56.450632,
+      "run_hours": 24,
+      "avg_alpha": 0.784037,
+      "E_wind_MWh": 367.484,
+      "E_pv_MWh": 509.44,
+      "E_re_MWh": 876.924,
+      "E_use_MWh": 841.620418,
+      "E_load_MWh": 60.72,
+      "E_charge_MWh": 173.706737,
+      "E_discharge_MWh": 138.403153,
+      "E_curtail_MWh": 0.0,
+      "E_unserved_MWh": 0.0,
+      "storage_capacity_MWh": 154.9716,
+      "daily_cost_yuan": 240085.584633,
+      "unit_cost_yuan_per_t": 4253.018543,
+      "capacity_utilization": 0.784037,
+      "renewable_utilization": 1.0
+    }
+  },
+  "no_storage_annual": {
+    "days": 360,
+    "total_production_t": 9781.5573,
+    "total_cost_yuan": 39677061.220035,
+    "unit_cost_yuan_per_t": 4056.313325,
+    "curtail_MWh": 14188.668,
+    "unserved_load_MWh": 8.292,
+    "capacity_utilization": 0.377375,
+    "renewable_utilization": 0.917195
+  },
+  "with_storage_annual": {
+    "days": 360,
+    "total_production_t": 10623.834645,
+    "total_cost_yuan": 51371872.40931,
+    "unit_cost_yuan_per_t": 4835.530119,
+    "curtail_MWh": 0.0,
+    "unserved_load_MWh": 0.0,
+    "capacity_utilization": 0.40987,
+    "renewable_utilization": 1.0
+  },
+  "grid_connected_reference_p3_36": {
+    "days": 360,
+    "total_production_t": 12960.0,
+    "total_cost_yuan": 54554817.220545,
+    "gross_cost_yuan": 77709711.220245,
+    "sell_revenue_yuan": 23154893.9997,
+    "unit_cost_yuan_per_t": 4209.476637,
+    "energy_MWh": {
+      "renewable": 171351.12,
+      "grid_buy": 91060.623,
+      "grid_sell": 61272.543,
+      "self_use": 110078.577,
+      "total_wide": 262411.743,
+      "internal_use": 201139.199955
+    },
+    "green_indicators": {
+      "self_use_ratio": 0.642415,
+      "green_ratio": 0.419488,
+      "sell_ratio": 0.357585,
+      "green_internal_use_ratio": 0.547276
+    },
+    "indicator_class_day_counts": {
+      "all_satisfied": 165,
+      "partly_satisfied": 195,
+      "none_satisfied": 0
+    }
+  }
+}

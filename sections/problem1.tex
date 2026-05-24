@@ -34,11 +34,14 @@ $P^{\mathrm{use}}_t = P^{\mathrm{ALK}}_t + P^{\mathrm{PEM}}_t
 而是以固定负荷方案作为后续优化问题的基线场景。
 
 新能源自发自用电量记为
-$E^{\mathrm{self}} = E^{\mathrm{re}} - E^{\mathrm{sell}}$。因此可以得到总用电量为
+$E^{\mathrm{self}} = E^{\mathrm{re}} - E^{\mathrm{sell}}$。为与题面三项
+绿电直连指标的电量边界保持一致，本文将指标中的``总用电量''按宽口径
+定义为
 $E^{\mathrm{total}} = E^{\mathrm{re}} + E^{\mathrm{buy}}
-= E^{\mathrm{self}} + E^{\mathrm{sell}} + E^{\mathrm{buy}}$。
-三项绿电直连指标分别刻画新能源就地消纳程度、园区用电绿电占比和
-新能源余电上网比例，其计算式为:
+= E^{\mathrm{self}} + E^{\mathrm{sell}} + E^{\mathrm{buy}}$，即新能源
+总发电量与网购电量之和；园区实际内部用电量另记为
+$E^{\mathrm{use}}$。在该口径下，三项绿电直连指标分别刻画新能源
+就地消纳程度、总用电量绿电比例和新能源余电上网比例，其计算式为:
 \begin{align}
   \Pi_{\mathrm{self}}
   &= \frac{E^{\mathrm{self}}}{E^{\mathrm{re}}}, &
@@ -48,8 +51,8 @@ $E^{\mathrm{total}} = E^{\mathrm{re}} + E^{\mathrm{buy}}
   &= \frac{E^{\mathrm{sell}}}{E^{\mathrm{re}}}.
   \label{eq:indicators}
 \end{align}
-式~\eqref{eq:indicators} 分别反映新能源就地消纳、园区绿电使用程度
-和对公共电网反送电的约束。其中三项指标需要分别满足
+式~\eqref{eq:indicators} 分别反映新能源就地消纳、宽口径总用电量
+中的绿电占比和对公共电网反送电的约束。其中三项指标需要分别满足
 $\Pi_{\mathrm{self}} > 60\%$、$\Pi_{\mathrm{green}} > 30\%$、
 $\Pi_{\mathrm{sell}} < 20\%$。
 
