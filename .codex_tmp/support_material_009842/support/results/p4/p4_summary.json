@@ -1,0 +1,758 @@
+{
+  "offgrid_no_storage": {
+    "scenario_count": 24,
+    "days_per_scenario": 15,
+    "annual_days": 360,
+    "annual_total_NH3_t": 9781.557398,
+    "annual_total_cost_yuan": 40877061.220048,
+    "annual_unit_cost_yuan_per_t": 4178.993136,
+    "annual_load_shed_MWh": 8.292,
+    "annual_curtail_MWh": 14188.668,
+    "annual_curtailment_ratio": 0.082805,
+    "annual_energy_self_sufficiency_ratio": 0.999621,
+    "annual_load_self_sufficiency_ratio": 0.999621,
+    "annual_plant_utilization": 0.377375,
+    "max_curtailment_scenario_id": "W4_P1",
+    "max_curtailment_MWh": 177.2918,
+    "note": "no storage, no grid purchase, no grid sale"
+  },
+  "storage": {
+    "status": "completed",
+    "summary": {
+      "selected_storage_config": {
+        "storage_power_MW": 5.0,
+        "storage_energy_MWh": 5.0,
+        "duration_h": 1.0
+      },
+      "annual_total_NH3_t": 9969.429518,
+      "annual_dispatch_cost_yuan": 41214126.856877,
+      "annual_storage_capex_yuan": 333333.333333,
+      "annual_total_cost_yuan": 41547460.19021,
+      "annual_unit_cost_yuan_per_t": 4167.486225,
+      "annual_plant_utilization": 0.384623,
+      "annual_curtail_MWh": 10983.992267,
+      "annual_curtailment_ratio": 0.064102,
+      "annual_load_shed_MWh": 0.0,
+      "improvement_vs_no_storage": {
+        "annual_NH3_increase_t": 187.87212,
+        "annual_curtail_reduction_MWh": 3204.675733,
+        "annual_load_shed_reduction_MWh": 8.292,
+        "unit_cost_change_yuan_per_t": -11.506911
+      },
+      "days_per_scenario": 15,
+      "annual_days": 360
+    }
+  },
+  "grid_offgrid_comparison": {
+    "status": "pending",
+    "note": "not implemented in stages B1/B1b"
+  },
+  "capacity_autonomy_estimation": {
+    "base_case_capacity": {
+      "wind_capacity_MW": 40.0,
+      "pv_capacity_MW": 64.0,
+      "annual_total_NH3_t": 9781.557398,
+      "annual_load_shed_MWh": 8.292,
+      "annual_curtail_MWh": 14188.668,
+      "annual_unit_cost_yuan_per_t": 4178.993136,
+      "annual_plant_utilization": 0.377375
+    },
+    "autonomy_by_original_capacity_baseline": {
+      "baseline_capacity": {
+        "wind_capacity_MW": 40.0,
+        "pv_capacity_MW": 64.0,
+        "total_capacity_MW": 104.0
+      },
+      "regular_load_autonomy": {
+        "fixed_ratio": {
+          "autonomy_level": "regular_load_autonomy",
+          "method": "fixed_ratio",
+          "scale_k": 1.092627,
+          "wind_capacity_MW": 43.705094,
+          "pv_capacity_MW": 69.92815,
+          "total_capacity_MW": 113.633244,
+          "added_wind_MW": 3.705094,
+          "added_pv_MW": 5.92815,
+          "added_total_MW": 9.633244,
+          "increase_ratio": 1.092627,
+          "min_hourly_margin_MW": -0.0,
+          "annual_NH3_t": 10553.50896,
+          "annual_curtail_MWh": 19373.512166,
+          "annual_unit_cost_yuan_per_t": 4200.368611,
+          "feasible": 1,
+          "note": "P_re >= P_load for all scenarios and hours"
+        },
+        "min_added_capacity_grid": {
+          "autonomy_level": "regular_load_autonomy",
+          "method": "min_added_capacity_grid",
+          "scale_k": null,
+          "wind_capacity_MW": 43.8,
+          "pv_capacity_MW": 64.0,
+          "total_capacity_MW": 107.8,
+          "added_wind_MW": 3.8,
+          "added_pv_MW": 0.0,
+          "added_total_MW": 3.8,
+          "increase_ratio": 1.036538,
+          "min_hourly_margin_MW": 0.00354,
+          "annual_NH3_t": 10368.578819,
+          "annual_curtail_MWh": 14934.6534,
+          "annual_unit_cost_yuan_per_t": 4165.202299,
+          "feasible": 1,
+          "note": "P_re >= P_load for all scenarios and hours"
+        }
+      },
+      "minimum_operation_autonomy": {
+        "fixed_ratio": {
+          "autonomy_level": "minimum_operation_autonomy",
+          "method": "fixed_ratio",
+          "scale_k": 3.874129,
+          "wind_capacity_MW": 154.965147,
+          "pv_capacity_MW": 247.944236,
+          "total_capacity_MW": 402.909383,
+          "added_wind_MW": 114.965147,
+          "added_pv_MW": 183.944236,
+          "added_total_MW": 298.909383,
+          "increase_ratio": 3.874129,
+          "min_hourly_margin_MW": 0.0,
+          "annual_NH3_t": 22676.620682,
+          "annual_curtail_MWh": 328283.836657,
+          "annual_unit_cost_yuan_per_t": 5712.263691,
+          "feasible": 1,
+          "note": "P_re >= P_load + 0.1*41.5 for all scenarios and hours"
+        },
+        "min_added_capacity_grid": {
+          "autonomy_level": "minimum_operation_autonomy",
+          "method": "min_added_capacity_grid",
+          "scale_k": null,
+          "wind_capacity_MW": 155.0,
+          "pv_capacity_MW": 64.0,
+          "total_capacity_MW": 219.0,
+          "added_wind_MW": 115.0,
+          "added_pv_MW": 0.0,
+          "added_total_MW": 115.0,
+          "increase_ratio": 2.105769,
+          "min_hourly_margin_MW": 0.0013,
+          "annual_NH3_t": 22088.375458,
+          "annual_curtail_MWh": 112513.7295,
+          "annual_unit_cost_yuan_per_t": 4603.660517,
+          "feasible": 1,
+          "note": "P_re >= P_load + 0.1*41.5 for all scenarios and hours"
+        }
+      },
+      "full_production_autonomy": {
+        "fixed_ratio": {
+          "autonomy_level": "full_production_autonomy",
+          "method": "fixed_ratio",
+          "scale_k": 28.907641,
+          "wind_capacity_MW": 1156.30563,
+          "pv_capacity_MW": 1850.089008,
+          "total_capacity_MW": 3006.394638,
+          "added_wind_MW": 1116.30563,
+          "added_pv_MW": 1786.089008,
+          "added_total_MW": 2902.394638,
+          "increase_ratio": 28.907641,
+          "min_hourly_margin_MW": 0.0,
+          "annual_NH3_t": 25920.0,
+          "annual_curtail_MWh": 4572937.419185,
+          "annual_unit_cost_yuan_per_t": 27771.75198,
+          "feasible": 1,
+          "note": "P_re >= P_load + 41.5 for all scenarios and hours"
+        },
+        "min_added_capacity_grid": {
+          "autonomy_level": "full_production_autonomy",
+          "method": "min_added_capacity_grid",
+          "scale_k": null,
+          "wind_capacity_MW": 1156.4,
+          "pv_capacity_MW": 64.0,
+          "total_capacity_MW": 1220.4,
+          "added_wind_MW": 1116.4,
+          "added_pv_MW": 0.0,
+          "added_total_MW": 1116.4,
+          "increase_ratio": 11.734615,
+          "min_hourly_margin_MW": 0.00352,
+          "annual_NH3_t": 25920.0,
+          "annual_curtail_MWh": 2398237.2312,
+          "annual_unit_cost_yuan_per_t": 17703.950644,
+          "feasible": 1,
+          "note": "P_re >= P_load + 41.5 for all scenarios and hours"
+        }
+      }
+    },
+    "regular_load_autonomy": {
+      "fixed_ratio": {
+        "autonomy_level": "regular_load_autonomy",
+        "method": "fixed_ratio",
+        "scale_k": 1.092627,
+        "wind_capacity_MW": 43.705094,
+        "pv_capacity_MW": 69.92815,
+        "total_capacity_MW": 113.633244,
+        "added_wind_MW": 3.705094,
+        "added_pv_MW": 5.92815,
+        "added_total_MW": 9.633244,
+        "increase_ratio": 1.092627,
+        "min_hourly_margin_MW": -0.0,
+        "annual_NH3_t": 10553.50896,
+        "annual_curtail_MWh": 19373.512166,
+        "annual_unit_cost_yuan_per_t": 4200.368611,
+        "feasible": 1,
+        "note": "P_re >= P_load for all scenarios and hours"
+      },
+      "min_added_capacity_grid": {
+        "autonomy_level": "regular_load_autonomy",
+        "method": "min_added_capacity_grid",
+        "scale_k": null,
+        "wind_capacity_MW": 43.8,
+        "pv_capacity_MW": 64.0,
+        "total_capacity_MW": 107.8,
+        "added_wind_MW": 3.8,
+        "added_pv_MW": 0.0,
+        "added_total_MW": 3.8,
+        "increase_ratio": 1.036538,
+        "min_hourly_margin_MW": 0.00354,
+        "annual_NH3_t": 10368.578819,
+        "annual_curtail_MWh": 14934.6534,
+        "annual_unit_cost_yuan_per_t": 4165.202299,
+        "feasible": 1,
+        "note": "P_re >= P_load for all scenarios and hours"
+      }
+    },
+    "minimum_operation_autonomy": {
+      "fixed_ratio": {
+        "autonomy_level": "minimum_operation_autonomy",
+        "method": "fixed_ratio",
+        "scale_k": 3.874129,
+        "wind_capacity_MW": 154.965147,
+        "pv_capacity_MW": 247.944236,
+        "total_capacity_MW": 402.909383,
+        "added_wind_MW": 114.965147,
+        "added_pv_MW": 183.944236,
+        "added_total_MW": 298.909383,
+        "increase_ratio": 3.874129,
+        "min_hourly_margin_MW": 0.0,
+        "annual_NH3_t": 22676.620682,
+        "annual_curtail_MWh": 328283.836657,
+        "annual_unit_cost_yuan_per_t": 5712.263691,
+        "feasible": 1,
+        "note": "P_re >= P_load + 0.1*41.5 for all scenarios and hours"
+      },
+      "min_added_capacity_grid": {
+        "autonomy_level": "minimum_operation_autonomy",
+        "method": "min_added_capacity_grid",
+        "scale_k": null,
+        "wind_capacity_MW": 155.0,
+        "pv_capacity_MW": 64.0,
+        "total_capacity_MW": 219.0,
+        "added_wind_MW": 115.0,
+        "added_pv_MW": 0.0,
+        "added_total_MW": 115.0,
+        "increase_ratio": 2.105769,
+        "min_hourly_margin_MW": 0.0013,
+        "annual_NH3_t": 22088.375458,
+        "annual_curtail_MWh": 112513.7295,
+        "annual_unit_cost_yuan_per_t": 4603.660517,
+        "feasible": 1,
+        "note": "P_re >= P_load + 0.1*41.5 for all scenarios and hours"
+      }
+    },
+    "full_production_autonomy": {
+      "fixed_ratio": {
+        "autonomy_level": "full_production_autonomy",
+        "method": "fixed_ratio",
+        "scale_k": 28.907641,
+        "wind_capacity_MW": 1156.30563,
+        "pv_capacity_MW": 1850.089008,
+        "total_capacity_MW": 3006.394638,
+        "added_wind_MW": 1116.30563,
+        "added_pv_MW": 1786.089008,
+        "added_total_MW": 2902.394638,
+        "increase_ratio": 28.907641,
+        "min_hourly_margin_MW": 0.0,
+        "annual_NH3_t": 25920.0,
+        "annual_curtail_MWh": 4572937.419185,
+        "annual_unit_cost_yuan_per_t": 27771.75198,
+        "feasible": 1,
+        "note": "P_re >= P_load + 41.5 for all scenarios and hours"
+      },
+      "min_added_capacity_grid": {
+        "autonomy_level": "full_production_autonomy",
+        "method": "min_added_capacity_grid",
+        "scale_k": null,
+        "wind_capacity_MW": 1156.4,
+        "pv_capacity_MW": 64.0,
+        "total_capacity_MW": 1220.4,
+        "added_wind_MW": 1116.4,
+        "added_pv_MW": 0.0,
+        "added_total_MW": 1116.4,
+        "increase_ratio": 11.734615,
+        "min_hourly_margin_MW": 0.00352,
+        "annual_NH3_t": 25920.0,
+        "annual_curtail_MWh": 2398237.2312,
+        "annual_unit_cost_yuan_per_t": 17703.950644,
+        "feasible": 1,
+        "note": "P_re >= P_load + 41.5 for all scenarios and hours"
+      }
+    },
+    "comparison_to_original_capacity": {
+      "original_wind_capacity_MW": 40.0,
+      "original_pv_capacity_MW": 64.0,
+      "original_total_capacity_MW": 104.0,
+      "note": "added capacity is measured relative to the original 40 MW wind and 64 MW PV capacities"
+    },
+    "same_annual_production_as_p3": {
+      "status": "supplementary_for_problem4_3",
+      "target_annual_NH3_t": 12960.0,
+      "annual_criterion_results": {
+        "fixed_ratio_results": {
+          "basic_autonomy": {
+            "target_type": "basic_autonomy",
+            "wind_capacity_MW": 43.705089,
+            "pv_capacity_MW": 69.928143,
+            "annual_NH3_t": 10553.508045,
+            "annual_load_shed_MWh": 1e-05,
+            "annual_curtail_MWh": 19373.504751,
+            "annual_curtailment_ratio": 0.103478,
+            "annual_unit_cost_yuan_per_t": 4200.368571,
+            "annual_plant_utilization": 0.407157,
+            "feasible": 1,
+            "scale_k": 1.092627
+          },
+          "production_autonomy": {
+            "target_type": "production_autonomy",
+            "wind_capacity_MW": 56.76076,
+            "pv_capacity_MW": 90.817216,
+            "annual_NH3_t": 12959.99999,
+            "annual_load_shed_MWh": 0.0,
+            "annual_curtail_MWh": 42011.295871,
+            "annual_curtailment_ratio": 0.172779,
+            "annual_unit_cost_yuan_per_t": 4318.510082,
+            "annual_plant_utilization": 0.5,
+            "feasible": 1,
+            "scale_k": 1.419019
+          },
+          "optional_full_production_autonomy": {
+            "target_type": "full_production_autonomy",
+            "wind_capacity_MW": 1156.305565,
+            "pv_capacity_MW": 1850.088904,
+            "annual_NH3_t": 25919.99999,
+            "annual_load_shed_MWh": 0.0,
+            "annual_curtail_MWh": 4572937.141317,
+            "annual_curtailment_ratio": 0.9232,
+            "annual_unit_cost_yuan_per_t": 27771.750528,
+            "annual_plant_utilization": 1.0,
+            "feasible": 1,
+            "scale_k": 28.907639
+          }
+        },
+        "grid_search_results": {
+          "basic_autonomy_min_capacity": {
+            "target_type": "basic_autonomy",
+            "wind_capacity_MW": 44.0,
+            "pv_capacity_MW": 64.0,
+            "annual_NH3_t": 10396.972627,
+            "annual_load_shed_MWh": 0.0,
+            "annual_curtail_MWh": 15008.964,
+            "annual_curtailment_ratio": 0.083063,
+            "annual_unit_cost_yuan_per_t": 4165.120467,
+            "annual_plant_utilization": 0.401118,
+            "feasible": 1,
+            "total_capacity_MW": 108.0,
+            "objective_value": 108.0
+          },
+          "production_autonomy_min_capacity": {
+            "target_type": "production_autonomy",
+            "wind_capacity_MW": 62.0,
+            "pv_capacity_MW": 64.0,
+            "annual_NH3_t": 13060.980434,
+            "annual_load_shed_MWh": 0.0,
+            "annual_curtail_MWh": 20195.1,
+            "annual_curtailment_ratio": 0.09067,
+            "annual_unit_cost_yuan_per_t": 4138.514515,
+            "annual_plant_utilization": 0.503896,
+            "feasible": 1,
+            "total_capacity_MW": 126.0,
+            "objective_value": 126.0
+          },
+          "production_autonomy_min_cost": {
+            "target_type": "production_autonomy",
+            "wind_capacity_MW": 65.0,
+            "pv_capacity_MW": 64.0,
+            "annual_NH3_t": 13513.455325,
+            "annual_load_shed_MWh": 0.0,
+            "annual_curtail_MWh": 20942.238,
+            "annual_curtailment_ratio": 0.091157,
+            "annual_unit_cost_yuan_per_t": 4133.553496,
+            "annual_plant_utilization": 0.521352,
+            "feasible": 1,
+            "total_capacity_MW": 129.0,
+            "objective_value": 129.0
+          },
+          "optional_full_production_autonomy": null,
+          "search_range": {
+            "coarse_wind_MW": [
+              40.0,
+              240.0,
+              5.0
+            ],
+            "coarse_pv_MW": [
+              64.0,
+              360.0,
+              5.0
+            ],
+            "refine_step_MW": 1.0
+          }
+        }
+      },
+      "robust_daily_36t_results": {
+        "scenario_fixed_ratio_requirements": {
+          "basic_autonomy": {
+            "scenario_id": "W2_P1",
+            "scale_k": 1.092621,
+            "wind_capacity_MW": 43.704826,
+            "pv_capacity_MW": 69.927721
+          },
+          "daily_36t": {
+            "scenario_id": "W2_P4",
+            "scale_k": 3.330865,
+            "wind_capacity_MW": 133.234586,
+            "pv_capacity_MW": 213.175338,
+            "daily_NH3_t": 35.99999002994256,
+            "daily_load_shed_MWh": 0.0
+          }
+        },
+        "grid_search_results": {
+          "robust_daily_36t_min_capacity": {
+            "target_type": "robust_daily_36t",
+            "wind_capacity_MW": 145.0,
+            "pv_capacity_MW": 65.0,
+            "total_capacity_MW": 210.0,
+            "annual_NH3_t": 21508.91512,
+            "annual_load_shed_MWh": 0.0,
+            "annual_curtail_MWh": 98392.7175,
+            "annual_curtailment_ratio": 0.235507,
+            "annual_unit_cost_yuan_per_t": 4526.679832,
+            "annual_plant_utilization": 0.829819,
+            "feasible": 1,
+            "objective_value": 210.0,
+            "min_daily_NH3_t": 36.007858,
+            "max_daily_load_shed_MWh": 0.0
+          },
+          "robust_daily_36t_min_cost": {
+            "target_type": "robust_daily_36t",
+            "wind_capacity_MW": 145.0,
+            "pv_capacity_MW": 65.0,
+            "total_capacity_MW": 210.0,
+            "annual_NH3_t": 21508.91512,
+            "annual_load_shed_MWh": 0.0,
+            "annual_curtail_MWh": 98392.7175,
+            "annual_curtailment_ratio": 0.235507,
+            "annual_unit_cost_yuan_per_t": 4526.679832,
+            "annual_plant_utilization": 0.829819,
+            "feasible": 1,
+            "objective_value": 210.0,
+            "min_daily_NH3_t": 36.007858,
+            "max_daily_load_shed_MWh": 0.0
+          },
+          "criterion": "all 24 scenarios: daily_load_shed_MWh <= 1e-5 and daily_NH3_t >= 36"
+        }
+      },
+      "note": "该结果用于与问题三联网方案进行经济性对比。"
+    },
+    "annual_criterion_results": {
+      "fixed_ratio_results": {
+        "basic_autonomy": {
+          "target_type": "basic_autonomy",
+          "wind_capacity_MW": 43.705089,
+          "pv_capacity_MW": 69.928143,
+          "annual_NH3_t": 10553.508045,
+          "annual_load_shed_MWh": 1e-05,
+          "annual_curtail_MWh": 19373.504751,
+          "annual_curtailment_ratio": 0.103478,
+          "annual_unit_cost_yuan_per_t": 4200.368571,
+          "annual_plant_utilization": 0.407157,
+          "feasible": 1,
+          "scale_k": 1.092627
+        },
+        "production_autonomy": {
+          "target_type": "production_autonomy",
+          "wind_capacity_MW": 56.76076,
+          "pv_capacity_MW": 90.817216,
+          "annual_NH3_t": 12959.99999,
+          "annual_load_shed_MWh": 0.0,
+          "annual_curtail_MWh": 42011.295871,
+          "annual_curtailment_ratio": 0.172779,
+          "annual_unit_cost_yuan_per_t": 4318.510082,
+          "annual_plant_utilization": 0.5,
+          "feasible": 1,
+          "scale_k": 1.419019
+        },
+        "optional_full_production_autonomy": {
+          "target_type": "full_production_autonomy",
+          "wind_capacity_MW": 1156.305565,
+          "pv_capacity_MW": 1850.088904,
+          "annual_NH3_t": 25919.99999,
+          "annual_load_shed_MWh": 0.0,
+          "annual_curtail_MWh": 4572937.141317,
+          "annual_curtailment_ratio": 0.9232,
+          "annual_unit_cost_yuan_per_t": 27771.750528,
+          "annual_plant_utilization": 1.0,
+          "feasible": 1,
+          "scale_k": 28.907639
+        }
+      },
+      "grid_search_results": {
+        "basic_autonomy_min_capacity": {
+          "target_type": "basic_autonomy",
+          "wind_capacity_MW": 44.0,
+          "pv_capacity_MW": 64.0,
+          "annual_NH3_t": 10396.972627,
+          "annual_load_shed_MWh": 0.0,
+          "annual_curtail_MWh": 15008.964,
+          "annual_curtailment_ratio": 0.083063,
+          "annual_unit_cost_yuan_per_t": 4165.120467,
+          "annual_plant_utilization": 0.401118,
+          "feasible": 1,
+          "total_capacity_MW": 108.0,
+          "objective_value": 108.0
+        },
+        "production_autonomy_min_capacity": {
+          "target_type": "production_autonomy",
+          "wind_capacity_MW": 62.0,
+          "pv_capacity_MW": 64.0,
+          "annual_NH3_t": 13060.980434,
+          "annual_load_shed_MWh": 0.0,
+          "annual_curtail_MWh": 20195.1,
+          "annual_curtailment_ratio": 0.09067,
+          "annual_unit_cost_yuan_per_t": 4138.514515,
+          "annual_plant_utilization": 0.503896,
+          "feasible": 1,
+          "total_capacity_MW": 126.0,
+          "objective_value": 126.0
+        },
+        "production_autonomy_min_cost": {
+          "target_type": "production_autonomy",
+          "wind_capacity_MW": 65.0,
+          "pv_capacity_MW": 64.0,
+          "annual_NH3_t": 13513.455325,
+          "annual_load_shed_MWh": 0.0,
+          "annual_curtail_MWh": 20942.238,
+          "annual_curtailment_ratio": 0.091157,
+          "annual_unit_cost_yuan_per_t": 4133.553496,
+          "annual_plant_utilization": 0.521352,
+          "feasible": 1,
+          "total_capacity_MW": 129.0,
+          "objective_value": 129.0
+        },
+        "optional_full_production_autonomy": null,
+        "search_range": {
+          "coarse_wind_MW": [
+            40.0,
+            240.0,
+            5.0
+          ],
+          "coarse_pv_MW": [
+            64.0,
+            360.0,
+            5.0
+          ],
+          "refine_step_MW": 1.0
+        }
+      }
+    },
+    "robust_scenario_criterion_results": {
+      "scenario_fixed_ratio_requirements": {
+        "basic_autonomy": {
+          "scenario_id": "W2_P1",
+          "scale_k": 1.092621,
+          "wind_capacity_MW": 43.704826,
+          "pv_capacity_MW": 69.927721
+        },
+        "daily_36t": {
+          "scenario_id": "W2_P4",
+          "scale_k": 3.330865,
+          "wind_capacity_MW": 133.234586,
+          "pv_capacity_MW": 213.175338,
+          "daily_NH3_t": 35.99999002994256,
+          "daily_load_shed_MWh": 0.0
+        }
+      },
+      "grid_search_results": {
+        "robust_daily_36t_min_capacity": {
+          "target_type": "robust_daily_36t",
+          "wind_capacity_MW": 145.0,
+          "pv_capacity_MW": 65.0,
+          "total_capacity_MW": 210.0,
+          "annual_NH3_t": 21508.91512,
+          "annual_load_shed_MWh": 0.0,
+          "annual_curtail_MWh": 98392.7175,
+          "annual_curtailment_ratio": 0.235507,
+          "annual_unit_cost_yuan_per_t": 4526.679832,
+          "annual_plant_utilization": 0.829819,
+          "feasible": 1,
+          "objective_value": 210.0,
+          "min_daily_NH3_t": 36.007858,
+          "max_daily_load_shed_MWh": 0.0
+        },
+        "robust_daily_36t_min_cost": {
+          "target_type": "robust_daily_36t",
+          "wind_capacity_MW": 145.0,
+          "pv_capacity_MW": 65.0,
+          "total_capacity_MW": 210.0,
+          "annual_NH3_t": 21508.91512,
+          "annual_load_shed_MWh": 0.0,
+          "annual_curtail_MWh": 98392.7175,
+          "annual_curtailment_ratio": 0.235507,
+          "annual_unit_cost_yuan_per_t": 4526.679832,
+          "annual_plant_utilization": 0.829819,
+          "feasible": 1,
+          "objective_value": 210.0,
+          "min_daily_NH3_t": 36.007858,
+          "max_daily_load_shed_MWh": 0.0
+        },
+        "criterion": "all 24 scenarios: daily_load_shed_MWh <= 1e-5 and daily_NH3_t >= 36"
+      }
+    },
+    "fixed_ratio_results": {
+      "basic_autonomy": {
+        "target_type": "basic_autonomy",
+        "wind_capacity_MW": 43.705089,
+        "pv_capacity_MW": 69.928143,
+        "annual_NH3_t": 10553.508045,
+        "annual_load_shed_MWh": 1e-05,
+        "annual_curtail_MWh": 19373.504751,
+        "annual_curtailment_ratio": 0.103478,
+        "annual_unit_cost_yuan_per_t": 4200.368571,
+        "annual_plant_utilization": 0.407157,
+        "feasible": 1,
+        "scale_k": 1.092627
+      },
+      "production_autonomy": {
+        "target_type": "production_autonomy",
+        "wind_capacity_MW": 56.76076,
+        "pv_capacity_MW": 90.817216,
+        "annual_NH3_t": 12959.99999,
+        "annual_load_shed_MWh": 0.0,
+        "annual_curtail_MWh": 42011.295871,
+        "annual_curtailment_ratio": 0.172779,
+        "annual_unit_cost_yuan_per_t": 4318.510082,
+        "annual_plant_utilization": 0.5,
+        "feasible": 1,
+        "scale_k": 1.419019
+      },
+      "optional_full_production_autonomy": {
+        "target_type": "full_production_autonomy",
+        "wind_capacity_MW": 1156.305565,
+        "pv_capacity_MW": 1850.088904,
+        "annual_NH3_t": 25919.99999,
+        "annual_load_shed_MWh": 0.0,
+        "annual_curtail_MWh": 4572937.141317,
+        "annual_curtailment_ratio": 0.9232,
+        "annual_unit_cost_yuan_per_t": 27771.750528,
+        "annual_plant_utilization": 1.0,
+        "feasible": 1,
+        "scale_k": 28.907639
+      }
+    },
+    "grid_search_results": {
+      "basic_autonomy_min_capacity": {
+        "target_type": "basic_autonomy",
+        "wind_capacity_MW": 44.0,
+        "pv_capacity_MW": 64.0,
+        "annual_NH3_t": 10396.972627,
+        "annual_load_shed_MWh": 0.0,
+        "annual_curtail_MWh": 15008.964,
+        "annual_curtailment_ratio": 0.083063,
+        "annual_unit_cost_yuan_per_t": 4165.120467,
+        "annual_plant_utilization": 0.401118,
+        "feasible": 1,
+        "total_capacity_MW": 108.0,
+        "objective_value": 108.0
+      },
+      "production_autonomy_min_capacity": {
+        "target_type": "production_autonomy",
+        "wind_capacity_MW": 62.0,
+        "pv_capacity_MW": 64.0,
+        "annual_NH3_t": 13060.980434,
+        "annual_load_shed_MWh": 0.0,
+        "annual_curtail_MWh": 20195.1,
+        "annual_curtailment_ratio": 0.09067,
+        "annual_unit_cost_yuan_per_t": 4138.514515,
+        "annual_plant_utilization": 0.503896,
+        "feasible": 1,
+        "total_capacity_MW": 126.0,
+        "objective_value": 126.0
+      },
+      "production_autonomy_min_cost": {
+        "target_type": "production_autonomy",
+        "wind_capacity_MW": 65.0,
+        "pv_capacity_MW": 64.0,
+        "annual_NH3_t": 13513.455325,
+        "annual_load_shed_MWh": 0.0,
+        "annual_curtail_MWh": 20942.238,
+        "annual_curtailment_ratio": 0.091157,
+        "annual_unit_cost_yuan_per_t": 4133.553496,
+        "annual_plant_utilization": 0.521352,
+        "feasible": 1,
+        "total_capacity_MW": 129.0,
+        "objective_value": 129.0
+      },
+      "optional_full_production_autonomy": null,
+      "search_range": {
+        "coarse_wind_MW": [
+          40.0,
+          240.0,
+          5.0
+        ],
+        "coarse_pv_MW": [
+          64.0,
+          360.0,
+          5.0
+        ],
+        "refine_step_MW": 1.0
+      }
+    },
+    "worst_case_scenario": {
+      "basic_autonomy": "W2_P1",
+      "daily_36t": "W2_P4"
+    },
+    "definition_notes": {
+      "regular_load_autonomy": "all 24 scenarios and all hours satisfy P_re >= P_load",
+      "minimum_operation_autonomy": "all 24 scenarios and all hours satisfy P_re >= P_load + 0.1*41.5",
+      "full_production_autonomy": "all 24 scenarios and all hours satisfy P_re >= P_load + 41.5",
+      "annual_basic_autonomy": "annual_load_shed_MWh <= 1e-5 after aggregating 24 scenarios, each representing 15 days",
+      "annual_production_autonomy": "annual basic autonomy plus annual_total_NH3_t >= 12960.0",
+      "robust_basic_autonomy": "same fixed capacity pair must make every scenario daily_load_shed_MWh <= 1e-5",
+      "robust_production_autonomy": "robust basic autonomy plus every scenario daily_NH3_t >= 36.0",
+      "optional_full_production_autonomy": "annual basic autonomy plus annual_total_NH3_t >= 25920.0",
+      "dispatch_model": "off-grid, no storage, no purchase, no sale, 0.1 z_t <= r_t <= z_t"
+    },
+    "explanation": "Problem 4 autonomy estimate is based on the original 40 MW wind and 64 MW PV capacity baseline and checks all 24 scenarios and all hours. The annual production criterion is used only for economic comparison with the grid-connected case.",
+    "recommendation": {
+      "report_note": "regular_load_autonomy gives the basic energy self-sufficiency capacity; full_production_autonomy gives the upper-bound capacity required to fully support 72 t/d production.",
+      "reason": "regular-load autonomy answers how much extra capacity is needed for basic park electricity self-sufficiency, while full-production autonomy shows that relying only on wind/PV expansion to guarantee 72 t/d production is extremely expensive."
+    }
+  },
+  "storage_configuration": {
+    "selected_storage_config": {
+      "storage_power_MW": 5.0,
+      "storage_energy_MWh": 5.0,
+      "duration_h": 1.0
+    },
+    "annual_total_NH3_t": 9969.429518,
+    "annual_dispatch_cost_yuan": 41214126.856877,
+    "annual_storage_capex_yuan": 333333.333333,
+    "annual_total_cost_yuan": 41547460.19021,
+    "annual_unit_cost_yuan_per_t": 4167.486225,
+    "annual_plant_utilization": 0.384623,
+    "annual_curtail_MWh": 10983.992267,
+    "annual_curtailment_ratio": 0.064102,
+    "annual_load_shed_MWh": 0.0,
+    "improvement_vs_no_storage": {
+      "annual_NH3_increase_t": 187.87212,
+      "annual_curtail_reduction_MWh": 3204.675733,
+      "annual_load_shed_reduction_MWh": 8.292,
+      "unit_cost_change_yuan_per_t": -11.506911
+    },
+    "days_per_scenario": 15,
+    "annual_days": 360
+  }
+}

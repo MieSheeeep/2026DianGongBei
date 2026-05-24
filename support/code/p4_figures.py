@@ -1,4 +1,4 @@
-"""Generate paper figures for problem four."""
+"""Generate paper figures for problem four with the latest p4 result schema."""
 
 from __future__ import annotations
 
@@ -11,12 +11,18 @@ import numpy as np
 
 HERE = Path(__file__).resolve().parent
 RESULT_DIR = HERE.parent / "results" / "p4"
+P3_RESULT_DIR = HERE.parent / "results" / "p3"
 FIG_DIR = HERE.parents[1] / "figures"
 
 
 def _read_csv(name: str) -> list[dict[str, str]]:
-    with (RESULT_DIR / name).open("r", encoding="utf-8", newline="") as f:
+    with (RESULT_DIR / name).open("r", encoding="utf-8-sig", newline="") as f:
         return list(csv.DictReader(f))
+
+
+def _read_json(path: Path) -> dict:
+    with path.open("r", encoding="utf-8") as f:
+        return json.load(f)
 
 
 def _style_axes(ax: plt.Axes, axis: str = "y") -> None:
@@ -29,12 +35,12 @@ def _style_axes(ax: plt.Axes, axis: str = "y") -> None:
 
 
 def plot_offgrid_dispatch_example() -> None:
-    rows = [r for r in _read_csv("p4_offgrid_no_storage_hourly.csv") if r["scenario_id"] == "W4_P1"]
+    rows = [r for r in _read_csv("p4_offgrid_hourly_cases.csv") if r["scenario_id"] == "W4_P1"]
     h = np.array([float(r["hour"]) + 0.5 for r in rows])
     p_re = np.array([float(r["P_re_MW"]) for r in rows])
-    p_use = np.array([float(r["P_load_MW"]) + float(r["P_alk_MW"]) + float(r["P_pem_MW"]) + float(r["P_nh3_MW"]) for r in rows])
+    p_use = np.array([float(r["P_load_MW"]) + float(r["P_plant_MW"]) for r in rows])
     p_curt = np.array([float(r["P_curtail_MW"]) for r in rows])
-    alpha = np.array([float(r["alpha"]) for r in rows])
+    ratio = np.array([float(r["plant_load_ratio"]) for r in rows])
 
     with plt.rc_context({"font.family": ["Times New Roman", "SimSun"], "axes.unicode_minus": False, "pdf.fonttype": 42, "ps.fonttype": 42}):
         fig, ax = plt.subplots(figsize=(6.7, 3.65))
@@ -48,8 +54,8 @@ def plot_offgrid_dispatch_example() -> None:
         ax.set_ylim(bottom=0)
         _style_axes(ax)
         ax2 = ax.twinx()
-        ax2.fill_between(h, alpha, 0, step="mid", color="#8FA9C7", alpha=0.25, label="负荷率")
-        ax2.plot(h, alpha, color="#5F7896", linewidth=1.4)
+        ax2.fill_between(h, ratio, 0, step="mid", color="#8FA9C7", alpha=0.25, label="负荷率")
+        ax2.plot(h, ratio, color="#5F7896", linewidth=1.4)
         ax2.set_ylabel("负荷率")
         ax2.set_ylim(0, 1.05)
         ax2.spines["top"].set_visible(False)
@@ -62,11 +68,12 @@ def plot_offgrid_dispatch_example() -> None:
 
 
 def plot_curtailment_by_scenario() -> None:
-    no_rows = _read_csv("p4_offgrid_no_storage_daily.csv")
-    st_rows = _read_csv("p4_storage_daily.csv")
+    no_rows = _read_csv("p4_offgrid_daily_cases.csv")
+    st_rows = _read_csv("p4_storage_daily_cases.csv")
     labels = [r["scenario_id"] for r in no_rows]
-    no = np.array([float(r["E_curtail_MWh"]) for r in no_rows])
-    st = np.array([float(r["E_curtail_MWh"]) for r in st_rows])
+    no = np.array([float(r["daily_curtail_MWh"]) for r in no_rows])
+    st_by_id = {r["scenario_id"]: float(r["daily_curtail_MWh"]) for r in st_rows}
+    st = np.array([st_by_id[label] for label in labels])
     x = np.arange(len(labels))
 
     with plt.rc_context({"font.family": ["Times New Roman", "SimSun"], "axes.unicode_minus": False, "pdf.fonttype": 42, "ps.fonttype": 42}):
@@ -83,12 +90,12 @@ def plot_curtailment_by_scenario() -> None:
 
 
 def plot_storage_dispatch() -> None:
-    rows = [r for r in _read_csv("p4_storage_hourly.csv") if r["scenario_id"] == "W4_P1"]
+    rows = [r for r in _read_csv("p4_storage_hourly_cases.csv") if r["scenario_id"] == "W4_P1"]
     h = np.array([float(r["hour"]) + 0.5 for r in rows])
     ch = np.array([float(r["P_charge_MW"]) for r in rows])
     dis = np.array([float(r["P_discharge_MW"]) for r in rows])
-    soc = np.array([float(r["E_storage_MWh"]) for r in rows])
-    alpha = np.array([float(r["alpha"]) for r in rows])
+    soc = np.array([float(r["SOC_MWh"]) for r in rows])
+    ratio = np.array([float(r["plant_load_ratio"]) for r in rows])
 
     with plt.rc_context({"font.family": ["Times New Roman", "SimSun"], "axes.unicode_minus": False, "pdf.fonttype": 42, "ps.fonttype": 42}):
         fig, ax = plt.subplots(figsize=(6.7, 3.55))
@@ -101,7 +108,7 @@ def plot_storage_dispatch() -> None:
         _style_axes(ax)
         ax2 = ax.twinx()
         ax2.plot(h, soc, color="#2C5C8A", linewidth=2.0, marker="o", markersize=3.0, markerfacecolor="white", markevery=2, label="储能电量")
-        ax2.plot(h, alpha * max(soc.max(), 1), color="#3B7F5C", linewidth=1.5, linestyle="--", label="负荷率(缩放)")
+        ax2.plot(h, ratio * max(float(soc.max()), 1.0), color="#3B7F5C", linewidth=1.5, linestyle="--", label="负荷率(缩放)")
         ax2.set_ylabel("储能电量 / MWh")
         ax2.spines["top"].set_visible(False)
         lines, labels = ax.get_legend_handles_labels()
@@ -113,18 +120,20 @@ def plot_storage_dispatch() -> None:
 
 
 def plot_mode_cost_compare() -> None:
-    with (RESULT_DIR / "p4_summary.json").open("r", encoding="utf-8") as f:
-        summary = json.load(f)
+    p4 = _read_json(RESULT_DIR / "p4_summary.json")
+    p3 = _read_json(P3_RESULT_DIR / "p3_summary.json")
+    no_storage = p4["offgrid_no_storage"]
+    storage = p4["storage"]["summary"]
     labels = ["联网连续", "离网无储能", "离网有储能"]
     costs = [
-        summary["grid_connected_reference_p3_36"]["unit_cost_yuan_per_t"],
-        summary["no_storage_annual"]["unit_cost_yuan_per_t"],
-        summary["with_storage_annual"]["unit_cost_yuan_per_t"],
+        p3["annual_recommended"]["unit_cost_yuan_per_t"],
+        no_storage["annual_unit_cost_yuan_per_t"],
+        storage["annual_unit_cost_yuan_per_t"],
     ]
     prod = [
-        summary["grid_connected_reference_p3_36"]["total_production_t"],
-        summary["no_storage_annual"]["total_production_t"],
-        summary["with_storage_annual"]["total_production_t"],
+        p3["annual_recommended"]["total_production_t"],
+        no_storage["annual_total_NH3_t"],
+        storage["annual_total_NH3_t"],
     ]
     x = np.arange(3)
 
@@ -132,9 +141,10 @@ def plot_mode_cost_compare() -> None:
         fig, ax = plt.subplots(figsize=(5.9, 3.35))
         ax.bar(x, costs, color=["#8FA9C7", "#D7A77A", "#92B39A"], edgecolor="#2B2B2B", linewidth=0.8)
         for i, (c, p) in enumerate(zip(costs, prod)):
-            ax.text(i, c + 130, f"{c:.0f}\n{p/10000:.2f}万t", ha="center", va="bottom", fontsize=8.0, color="#222222")
+            ax.text(i, c + 80, f"{c:.0f}\n{p/10000:.2f}万t", ha="center", va="bottom", fontsize=8.0, color="#222222")
         ax.set_xticks(x, labels)
         ax.set_ylabel("吨氨成本 / (元/t)")
+        ax.set_ylim(0, max(costs) * 1.20)
         _style_axes(ax)
         fig.tight_layout(pad=0.9)
         fig.savefig(FIG_DIR / "p4_mode_cost_compare.pdf", bbox_inches="tight")

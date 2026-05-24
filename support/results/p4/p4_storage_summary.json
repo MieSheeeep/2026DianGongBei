@@ -1,0 +1,24 @@
+{
+  "selected_storage_config": {
+    "storage_power_MW": 5.0,
+    "storage_energy_MWh": 5.0,
+    "duration_h": 1.0
+  },
+  "annual_total_NH3_t": 9969.429518,
+  "annual_dispatch_cost_yuan": 41214126.856877,
+  "annual_storage_capex_yuan": 333333.333333,
+  "annual_total_cost_yuan": 41547460.19021,
+  "annual_unit_cost_yuan_per_t": 4167.486225,
+  "annual_plant_utilization": 0.384623,
+  "annual_curtail_MWh": 10983.992267,
+  "annual_curtailment_ratio": 0.064102,
+  "annual_load_shed_MWh": 0.0,
+  "improvement_vs_no_storage": {
+    "annual_NH3_increase_t": 187.87212,
+    "annual_curtail_reduction_MWh": 3204.675733,
+    "annual_load_shed_reduction_MWh": 8.292,
+    "unit_cost_change_yuan_per_t": -11.506911
+  },
+  "days_per_scenario": 15,
+  "annual_days": 360
+}

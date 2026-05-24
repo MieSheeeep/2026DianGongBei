@@ -1,0 +1,7 @@
+﻿autonomy_level,method,scale_k,wind_capacity_MW,pv_capacity_MW,total_capacity_MW,added_wind_MW,added_pv_MW,added_total_MW,increase_ratio,min_hourly_margin_MW,annual_NH3_t,annual_curtail_MWh,annual_unit_cost_yuan_per_t,feasible,note
+regular_load_autonomy,fixed_ratio,1.092627,43.705094,69.92815,113.633244,3.705094,5.92815,9.633244,1.092627,-0.0,10553.50896,19373.512166,4200.368611,1,P_re >= P_load for all scenarios and hours
+regular_load_autonomy,min_added_capacity_grid,,43.8,64.0,107.8,3.8,0.0,3.8,1.036538,0.00354,10368.578819,14934.6534,4165.202299,1,P_re >= P_load for all scenarios and hours
+minimum_operation_autonomy,fixed_ratio,3.874129,154.965147,247.944236,402.909383,114.965147,183.944236,298.909383,3.874129,0.0,22676.620682,328283.836657,5712.263691,1,P_re >= P_load + 0.1*41.5 for all scenarios and hours
+minimum_operation_autonomy,min_added_capacity_grid,,155.0,64.0,219.0,115.0,0.0,115.0,2.105769,0.0013,22088.375458,112513.7295,4603.660517,1,P_re >= P_load + 0.1*41.5 for all scenarios and hours
+full_production_autonomy,fixed_ratio,28.907641,1156.30563,1850.089008,3006.394638,1116.30563,1786.089008,2902.394638,28.907641,0.0,25920.0,4572937.419185,27771.75198,1,P_re >= P_load + 41.5 for all scenarios and hours
+full_production_autonomy,min_added_capacity_grid,,1156.4,64.0,1220.4,1116.4,0.0,1116.4,11.734615,0.00352,25920.0,2398237.2312,17703.950644,1,P_re >= P_load + 41.5 for all scenarios and hours

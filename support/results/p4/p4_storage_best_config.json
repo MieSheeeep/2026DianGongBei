@@ -1,0 +1,118 @@
+{
+  "selected_storage_power_MW": 5.0,
+  "selected_storage_energy_MWh": 5.0,
+  "duration_h": 1.0,
+  "selected_scheme": "economic_compromise",
+  "selection_rule": "dual scheme: economic_compromise minimizes unit/incremental production cost; absorption_oriented maximizes W4_P1 curtailment reduction",
+  "W4_P1_before": {
+    "daily_NH3_t": 46.186424096385544,
+    "daily_curtail_MWh": 177.2918,
+    "daily_load_shed_MWh": 0.0,
+    "daily_cost_yuan": 196612.29325140562,
+    "unit_cost_yuan_per_t": 4256.928244565963
+  },
+  "W4_P1_after": {
+    "daily_NH3_t": 46.76767039003784,
+    "daily_curtail_MWh": 164.30083723001556,
+    "daily_load_shed_MWh": 0.0,
+    "daily_cost_yuan": 198713.69591152333,
+    "unit_cost_yuan_per_t": 4248.95433649507
+  },
+  "curtail_reduction_MWh": 12.990962769984435,
+  "NH3_increase_t": 0.5812462936522991,
+  "cost_change_yuan": 2101.4026601177175,
+  "unit_cost_change_yuan_per_t": -7.973908070893231,
+  "economic_compromise_config": {
+    "candidate_id": "S002",
+    "storage_power_MW": 5.0,
+    "storage_energy_MWh": 5.0,
+    "duration_h": 1.0,
+    "W4_P1_after": {
+      "daily_NH3_t": 46.76767039003784,
+      "daily_curtail_MWh": 164.30083723001556,
+      "daily_load_shed_MWh": 0.0,
+      "daily_cost_yuan": 198713.69591152333,
+      "unit_cost_yuan_per_t": 4248.95433649507
+    },
+    "curtail_reduction_MWh": 12.990962769984435,
+    "NH3_increase_t": 0.5812462936522991,
+    "cost_change_yuan": 2101.4026601177175,
+    "unit_cost_change_yuan_per_t": -7.973908070893231
+  },
+  "absorption_oriented_config": {
+    "candidate_id": "S032",
+    "storage_power_MW": 40.0,
+    "storage_energy_MWh": 160.0,
+    "duration_h": 4.0,
+    "W4_P1_after": {
+      "daily_NH3_t": 56.40926192293221,
+      "daily_curtail_MWh": 0.0,
+      "daily_load_shed_MWh": 0.0,
+      "daily_cost_yuan": 244668.50999577856,
+      "unit_cost_yuan_per_t": 4337.381870552587
+    },
+    "curtail_reduction_MWh": 177.2918,
+    "NH3_increase_t": 10.222837826546666,
+    "cost_change_yuan": 48056.21674437294,
+    "unit_cost_change_yuan_per_t": 80.4536259866245
+  },
+  "storage_cost_assumptions": {
+    "source_file": "附件6：储能设备和合成氨装置技术参数.xlsx",
+    "raw_rows": [
+      [
+        "",
+        "电储能",
+        "合成氨装置"
+      ],
+      [
+        "投资成本",
+        "1000 ¥/kWh",
+        "60000 ¥/kgH2"
+      ],
+      [
+        "运维系数(元/kWh)",
+        "0.01",
+        "0.002"
+      ],
+      [
+        "使用寿命(年)",
+        "15",
+        "30"
+      ],
+      [
+        "效率(%)",
+        "90（充电）/90（放电）",
+        "—"
+      ],
+      [
+        "自损耗率(%)",
+        "0.2",
+        "0"
+      ],
+      [
+        "用电/用氢需求",
+        "—",
+        "0.5 kWh/kgNH3和0.2kgH2/kgNH3"
+      ]
+    ],
+    "capex_yuan_per_kWh": 1000.0,
+    "power_capex_yuan_per_kW": null,
+    "opex_yuan_per_kWh": 0.01,
+    "lifetime_years": 15,
+    "charge_efficiency": 0.9,
+    "discharge_efficiency": 0.9,
+    "self_loss_rate_per_hour": 0.002,
+    "soc_min_fraction": 0.0,
+    "soc_max_fraction": 1.0,
+    "notes": [
+      "Attachment 6 gives storage investment as 1000 yuan/kWh; no separate power-capacity investment cost is provided.",
+      "SOC bounds are not explicitly given in Attachment 6; dispatch uses 0 to 100% of selected energy capacity.",
+      "Charge/discharge power limits are candidate configuration variables."
+    ]
+  },
+  "candidate_benchmarks": {
+    "minimum_unit_cost": "S002",
+    "maximum_curtailment_reduction": "S032",
+    "best_incremental_cost_per_added_NH3": "S002"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "scenario_count": 24,
+  "days_per_scenario": 15,
+  "annual_days": 360,
+  "annual_total_NH3_t": 9781.557398,
+  "annual_total_cost_yuan": 40877061.220048,
+  "annual_unit_cost_yuan_per_t": 4178.993136,
+  "annual_load_shed_MWh": 8.292,
+  "annual_curtail_MWh": 14188.668,
+  "annual_curtailment_ratio": 0.082805,
+  "annual_energy_self_sufficiency_ratio": 0.999621,
+  "annual_load_self_sufficiency_ratio": 0.999621,
+  "annual_plant_utilization": 0.377375,
+  "max_curtailment_scenario_id": "W4_P1",
+  "max_curtailment_MWh": 177.2918,
+  "note": "no storage, no grid purchase, no grid sale"
+}
