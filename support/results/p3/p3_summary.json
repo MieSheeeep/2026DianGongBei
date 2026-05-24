@@ -14,7 +14,9 @@
     "pem_MW": 20.0,
     "nh3_MW": 1.5,
     "nh3_tph": 3.0,
-    "min_load_ratio": 0.1
+    "plant_MW": 41.5,
+    "min_load_ratio": 0.1,
+    "dispatch_model": "synchronized_plant_load_ratio"
   },
   "annual_by_production": {
     "72": {
@@ -47,23 +49,23 @@
     "63": {
       "days": 360,
       "total_production_t": 22680.0,
-      "total_cost_yuan": 144372649.42146,
-      "gross_cost_yuan": 148937196.57576,
+      "total_cost_yuan": 145449704.4285,
+      "gross_cost_yuan": 150014251.5828,
       "sell_revenue_yuan": 4564547.1543,
-      "unit_cost_yuan_per_t": 6365.6371,
+      "unit_cost_yuan_per_t": 6413.126298,
       "energy_MWh": {
         "renewable": 171351.12,
-        "grid_buy": 174226.25142,
+        "grid_buy": 176326.797,
         "grid_sell": 12078.717,
         "self_use": 159272.403,
-        "total_wide": 345577.37142,
-        "internal_use": 333498.654435
+        "total_wide": 347677.917,
+        "internal_use": 335599.200045
       },
       "green_indicators": {
         "self_use_ratio": 0.929509,
-        "green_ratio": 0.460888,
+        "green_ratio": 0.458103,
         "sell_ratio": 0.070491,
-        "green_internal_use_ratio": 0.47758
+        "green_internal_use_ratio": 0.474591
       },
       "indicator_class_day_counts": {
         "all_satisfied": 300,
@@ -74,275 +76,275 @@
     "54": {
       "days": 360,
       "total_production_t": 19440.0,
-      "total_cost_yuan": 109406354.23563,
-      "gross_cost_yuan": 116411169.274065,
-      "sell_revenue_yuan": 7004815.038435,
-      "unit_cost_yuan_per_t": 5627.89888,
+      "total_cost_yuan": 110107162.55106,
+      "gross_cost_yuan": 116835075.72486,
+      "sell_revenue_yuan": 6727913.1738,
+      "unit_cost_yuan_per_t": 5663.948691,
       "energy_MWh": {
         "renewable": 171351.12,
-        "grid_buy": 135638.19621,
-        "grid_sell": 18536.160465,
-        "self_use": 152814.959535,
-        "total_wide": 306989.31621,
-        "internal_use": 288453.15573
+        "grid_buy": 137231.502,
+        "grid_sell": 17803.422,
+        "self_use": 153547.698,
+        "total_wide": 308582.622,
+        "internal_use": 290779.199985
       },
       "green_indicators": {
-        "self_use_ratio": 0.891824,
-        "green_ratio": 0.497786,
-        "sell_ratio": 0.108176,
-        "green_internal_use_ratio": 0.529774
+        "self_use_ratio": 0.8961,
+        "green_ratio": 0.49759,
+        "sell_ratio": 0.1039,
+        "green_internal_use_ratio": 0.528056
       },
       "indicator_class_day_counts": {
-        "all_satisfied": 225,
-        "partly_satisfied": 135,
+        "all_satisfied": 240,
+        "partly_satisfied": 120,
         "none_satisfied": 0
       }
     },
     "45": {
       "days": 360,
       "total_production_t": 16200.0,
-      "total_cost_yuan": 80113494.762,
-      "gross_cost_yuan": 94171692.951735,
-      "sell_revenue_yuan": 14058198.189735,
-      "unit_cost_yuan_per_t": 4945.277454,
+      "total_cost_yuan": 81141978.081015,
+      "gross_cost_yuan": 94351684.960815,
+      "sell_revenue_yuan": 13209706.8798,
+      "unit_cost_yuan_per_t": 5008.764079,
       "energy_MWh": {
         "renewable": 171351.12,
-        "grid_buy": 107472.06477,
-        "grid_sell": 37200.84201,
-        "self_use": 134150.27799,
-        "total_wide": 278823.18477,
-        "internal_use": 241622.34282
+        "grid_buy": 109563.642,
+        "grid_sell": 34955.562,
+        "self_use": 136395.558,
+        "total_wide": 280914.762,
+        "internal_use": 245959.2
       },
       "green_indicators": {
-        "self_use_ratio": 0.782897,
-        "green_ratio": 0.48113,
-        "sell_ratio": 0.217103,
-        "green_internal_use_ratio": 0.555206
+        "self_use_ratio": 0.796,
+        "green_ratio": 0.485541,
+        "sell_ratio": 0.204,
+        "green_internal_use_ratio": 0.554545
       },
       "indicator_class_day_counts": {
-        "all_satisfied": 225,
-        "partly_satisfied": 135,
+        "all_satisfied": 240,
+        "partly_satisfied": 120,
         "none_satisfied": 0
       }
     },
     "36": {
       "days": 360,
       "total_production_t": 12960.0,
-      "total_cost_yuan": 54146217.445545,
-      "gross_cost_yuan": 77909092.081245,
-      "sell_revenue_yuan": 23762874.6357,
-      "unit_cost_yuan_per_t": 4177.948877,
+      "total_cost_yuan": 54554817.22053,
+      "gross_cost_yuan": 77709711.22023,
+      "sell_revenue_yuan": 23154893.9997,
+      "unit_cost_yuan_per_t": 4209.476637,
       "energy_MWh": {
         "renewable": 171351.12,
-        "grid_buy": 90475.713,
-        "grid_sell": 62881.383,
-        "self_use": 108469.737,
-        "total_wide": 261826.833,
-        "internal_use": 198945.45
+        "grid_buy": 91060.623,
+        "grid_sell": 61272.543,
+        "self_use": 110078.577,
+        "total_wide": 262411.743,
+        "internal_use": 201139.199955
       },
       "green_indicators": {
-        "self_use_ratio": 0.633026,
-        "green_ratio": 0.41428,
-        "sell_ratio": 0.366974,
-        "green_internal_use_ratio": 0.545224
+        "self_use_ratio": 0.642415,
+        "green_ratio": 0.419488,
+        "sell_ratio": 0.357585,
+        "green_internal_use_ratio": 0.547276
       },
       "indicator_class_day_counts": {
         "all_satisfied": 165,
-        "partly_satisfied": 180,
-        "none_satisfied": 15
+        "partly_satisfied": 195,
+        "none_satisfied": 0
       }
     }
   },
   "annual_recommended": {
     "days": 360,
     "total_production_t": 12960.0,
-    "total_cost_yuan": 54146217.445545,
-    "gross_cost_yuan": 77909092.081245,
-    "sell_revenue_yuan": 23762874.6357,
-    "unit_cost_yuan_per_t": 4177.948877,
+    "total_cost_yuan": 54554817.22053,
+    "gross_cost_yuan": 77709711.22023,
+    "sell_revenue_yuan": 23154893.9997,
+    "unit_cost_yuan_per_t": 4209.476637,
     "energy_MWh": {
       "renewable": 171351.12,
-      "grid_buy": 90475.713,
-      "grid_sell": 62881.383,
-      "self_use": 108469.737,
-      "total_wide": 261826.833,
-      "internal_use": 198945.45
+      "grid_buy": 91060.623,
+      "grid_sell": 61272.543,
+      "self_use": 110078.577,
+      "total_wide": 262411.743,
+      "internal_use": 201139.199955
     },
     "green_indicators": {
-      "self_use_ratio": 0.633026,
-      "green_ratio": 0.41428,
-      "sell_ratio": 0.366974,
-      "green_internal_use_ratio": 0.545224
+      "self_use_ratio": 0.642415,
+      "green_ratio": 0.419488,
+      "sell_ratio": 0.357585,
+      "green_internal_use_ratio": 0.547276
     },
     "indicator_class_day_counts": {
       "all_satisfied": 165,
-      "partly_satisfied": 180,
-      "none_satisfied": 15
+      "partly_satisfied": 195,
+      "none_satisfied": 0
     }
   },
   "recommended_daily_cases": {
     "W1_P1": {
       "target_NH3_t_per_day": 36.0,
-      "unit_cost_yuan_per_t": 2085.987675,
+      "unit_cost_yuan_per_t": 2107.304342,
       "indicator_class": "partly_satisfied"
     },
     "W1_P2": {
       "target_NH3_t_per_day": 36.0,
-      "unit_cost_yuan_per_t": 3924.398342,
+      "unit_cost_yuan_per_t": 3945.715008,
       "indicator_class": "partly_satisfied"
     },
     "W1_P3": {
       "target_NH3_t_per_day": 36.0,
-      "unit_cost_yuan_per_t": 5111.884564,
+      "unit_cost_yuan_per_t": 5133.201231,
       "indicator_class": "all_satisfied"
     },
     "W1_P4": {
       "target_NH3_t_per_day": 36.0,
-      "unit_cost_yuan_per_t": 5748.3449,
+      "unit_cost_yuan_per_t": 5807.911567,
       "indicator_class": "all_satisfied"
     },
     "W2_P1": {
       "target_NH3_t_per_day": 36.0,
-      "unit_cost_yuan_per_t": 2772.833175,
-      "indicator_class": "none_satisfied"
+      "unit_cost_yuan_per_t": 2794.149842,
+      "indicator_class": "partly_satisfied"
     },
     "W2_P2": {
       "target_NH3_t_per_day": 36.0,
-      "unit_cost_yuan_per_t": 4611.243842,
+      "unit_cost_yuan_per_t": 4632.560508,
       "indicator_class": "partly_satisfied"
     },
     "W2_P3": {
       "target_NH3_t_per_day": 36.0,
-      "unit_cost_yuan_per_t": 5973.556789,
+      "unit_cost_yuan_per_t": 6033.123456,
       "indicator_class": "all_satisfied"
     },
     "W2_P4": {
       "target_NH3_t_per_day": 36.0,
-      "unit_cost_yuan_per_t": 6880.778317,
+      "unit_cost_yuan_per_t": 6940.344983,
       "indicator_class": "all_satisfied"
     },
     "W3_P1": {
       "target_NH3_t_per_day": 36.0,
-      "unit_cost_yuan_per_t": 1923.449219,
+      "unit_cost_yuan_per_t": 1944.765886,
       "indicator_class": "partly_satisfied"
     },
     "W3_P2": {
       "target_NH3_t_per_day": 36.0,
-      "unit_cost_yuan_per_t": 3761.859886,
+      "unit_cost_yuan_per_t": 3783.176553,
       "indicator_class": "partly_satisfied"
     },
     "W3_P3": {
       "target_NH3_t_per_day": 36.0,
-      "unit_cost_yuan_per_t": 4949.346108,
+      "unit_cost_yuan_per_t": 4970.662775,
       "indicator_class": "all_satisfied"
     },
     "W3_P4": {
       "target_NH3_t_per_day": 36.0,
-      "unit_cost_yuan_per_t": 5561.810361,
+      "unit_cost_yuan_per_t": 5621.377028,
       "indicator_class": "all_satisfied"
     },
     "W4_P1": {
       "target_NH3_t_per_day": 36.0,
-      "unit_cost_yuan_per_t": 1346.224231,
+      "unit_cost_yuan_per_t": 1373.992172,
       "indicator_class": "partly_satisfied"
     },
     "W4_P2": {
       "target_NH3_t_per_day": 36.0,
-      "unit_cost_yuan_per_t": 3191.086172,
+      "unit_cost_yuan_per_t": 3212.402839,
       "indicator_class": "partly_satisfied"
     },
     "W4_P3": {
       "target_NH3_t_per_day": 36.0,
-      "unit_cost_yuan_per_t": 4378.572394,
+      "unit_cost_yuan_per_t": 4399.889061,
       "indicator_class": "partly_satisfied"
     },
     "W4_P4": {
       "target_NH3_t_per_day": 36.0,
-      "unit_cost_yuan_per_t": 4841.646172,
+      "unit_cost_yuan_per_t": 4862.962839,
       "indicator_class": "all_satisfied"
     },
     "W5_P1": {
       "target_NH3_t_per_day": 36.0,
-      "unit_cost_yuan_per_t": 1689.645497,
+      "unit_cost_yuan_per_t": 1710.962164,
       "indicator_class": "partly_satisfied"
     },
     "W5_P2": {
       "target_NH3_t_per_day": 36.0,
-      "unit_cost_yuan_per_t": 3528.056164,
+      "unit_cost_yuan_per_t": 3549.372831,
       "indicator_class": "partly_satisfied"
     },
     "W5_P3": {
       "target_NH3_t_per_day": 36.0,
-      "unit_cost_yuan_per_t": 4715.542386,
+      "unit_cost_yuan_per_t": 4736.859053,
       "indicator_class": "all_satisfied"
     },
     "W5_P4": {
       "target_NH3_t_per_day": 36.0,
-      "unit_cost_yuan_per_t": 5178.616164,
+      "unit_cost_yuan_per_t": 5209.047806,
       "indicator_class": "all_satisfied"
     },
     "W6_P1": {
       "target_NH3_t_per_day": 36.0,
-      "unit_cost_yuan_per_t": 2315.857608,
+      "unit_cost_yuan_per_t": 2337.174275,
       "indicator_class": "partly_satisfied"
     },
     "W6_P2": {
       "target_NH3_t_per_day": 36.0,
-      "unit_cost_yuan_per_t": 4154.268275,
+      "unit_cost_yuan_per_t": 4175.584942,
       "indicator_class": "partly_satisfied"
     },
     "W6_P3": {
       "target_NH3_t_per_day": 36.0,
-      "unit_cost_yuan_per_t": 5367.342472,
+      "unit_cost_yuan_per_t": 5426.909139,
       "indicator_class": "all_satisfied"
     },
     "W6_P4": {
       "target_NH3_t_per_day": 36.0,
-      "unit_cost_yuan_per_t": 6258.422333,
+      "unit_cost_yuan_per_t": 6317.989,
       "indicator_class": "all_satisfied"
     }
   },
   "p2_comparison": {
     "available": true,
     "annual_recommended": {
-      "unit_cost_delta_yuan_per_t": -315.873736,
-      "grid_buy_delta_MWh": -16801.839,
-      "grid_sell_delta_MWh": -14608.089,
-      "self_use_ratio_delta": 0.085252,
-      "green_ratio_delta": 0.07741,
-      "sell_ratio_delta": -0.085252
+      "unit_cost_delta_yuan_per_t": -284.345976,
+      "grid_buy_delta_MWh": -16216.929,
+      "grid_sell_delta_MWh": -16216.929,
+      "self_use_ratio_delta": 0.094641,
+      "green_ratio_delta": 0.082618,
+      "sell_ratio_delta": -0.094641
     },
     "annual_by_production": {
       "36": {
-        "unit_cost_delta_yuan_per_t": -315.873736,
-        "grid_buy_delta_MWh": -16801.839,
-        "grid_sell_delta_MWh": -14608.089,
-        "self_use_ratio_delta": 0.085252,
-        "green_ratio_delta": 0.07741,
-        "sell_ratio_delta": -0.085252
+        "unit_cost_delta_yuan_per_t": -284.345976,
+        "grid_buy_delta_MWh": -16216.929,
+        "grid_sell_delta_MWh": -16216.929,
+        "self_use_ratio_delta": 0.094641,
+        "green_ratio_delta": 0.082618,
+        "sell_ratio_delta": -0.094641
       },
       "45": {
-        "unit_cost_delta_yuan_per_t": -345.038609,
-        "grid_buy_delta_MWh": -20505.43023,
-        "grid_sell_delta_MWh": -16168.57299,
-        "self_use_ratio_delta": 0.094359,
-        "green_ratio_delta": 0.086976,
-        "sell_ratio_delta": -0.094359
+        "unit_cost_delta_yuan_per_t": -281.551984,
+        "grid_buy_delta_MWh": -18413.853,
+        "grid_sell_delta_MWh": -18413.853,
+        "self_use_ratio_delta": 0.107462,
+        "green_ratio_delta": 0.091387,
+        "sell_ratio_delta": -0.107462
       },
       "54": {
-        "unit_cost_delta_yuan_per_t": -281.756648,
-        "grid_buy_delta_MWh": -14611.66179,
-        "grid_sell_delta_MWh": -12285.617535,
-        "self_use_ratio_delta": 0.071699,
-        "green_ratio_delta": 0.060818,
-        "sell_ratio_delta": -0.071699
+        "unit_cost_delta_yuan_per_t": -245.706837,
+        "grid_buy_delta_MWh": -13018.356,
+        "grid_sell_delta_MWh": -13018.356,
+        "self_use_ratio_delta": 0.075975,
+        "green_ratio_delta": 0.060622,
+        "sell_ratio_delta": -0.075975
       },
       "63": {
-        "unit_cost_delta_yuan_per_t": -157.637027,
-        "grid_buy_delta_MWh": -9235.87758,
+        "unit_cost_delta_yuan_per_t": -110.147829,
+        "grid_buy_delta_MWh": -7135.332,
         "grid_sell_delta_MWh": -7135.332,
         "self_use_ratio_delta": 0.041642,
-        "green_ratio_delta": 0.032107,
+        "green_ratio_delta": 0.029322,
         "sell_ratio_delta": -0.041642
       },
       "72": {
@@ -356,12 +358,12 @@
     }
   },
   "total_production_t": 12960.0,
-  "total_cost_yuan": 54146217.445545,
-  "unit_cost_yuan_per_t": 4177.948877,
+  "total_cost_yuan": 54554817.22053,
+  "unit_cost_yuan_per_t": 4209.476637,
   "green_indicators": {
-    "self_use_ratio": 0.633026,
-    "green_ratio": 0.41428,
-    "sell_ratio": 0.366974,
-    "green_internal_use_ratio": 0.545224
+    "self_use_ratio": 0.642415,
+    "green_ratio": 0.419488,
+    "sell_ratio": 0.357585,
+    "green_internal_use_ratio": 0.547276
   }
 }

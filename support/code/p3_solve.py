@@ -57,24 +57,24 @@ NH3_MAX_MW = NH3_CAPACITY_MW * EXPANSION_FACTOR
 NH3_MAX_TPH = NH3_RATE_TPH * EXPANSION_FACTOR
 
 MIN_LOAD_RATIO = 0.10
-ALK_MIN_MW = ALK_MAX_MW * MIN_LOAD_RATIO
-PEM_MIN_MW = PEM_MAX_MW * MIN_LOAD_RATIO
-NH3_MIN_TPH = NH3_MAX_TPH * MIN_LOAD_RATIO
-
 ALK_H2_KG_PER_MWH = ALK_H2_RATE_KGH / ALK_CAPACITY_MW
 PEM_H2_KG_PER_MWH = PEM_H2_RATE_KGH / PEM_CAPACITY_MW
 NH3_H2_KG_PER_T = NH3_H2_KG_PER_KGNH3 * 1000.0
 NH3_MW_PER_TPH = NH3_MAX_MW / NH3_MAX_TPH
+PLANT_MAX_MW = ALK_MAX_MW + PEM_MAX_MW + NH3_MAX_MW
+PLANT_OPEX_YUAN_PER_KWH_AT_FULL_LOAD = (
+    ALK_OPEX_YUAN_PER_KWH * ALK_MAX_MW
+    + PEM_OPEX_YUAN_PER_KWH * PEM_MAX_MW
+    + NH3_OPEX_YUAN_PER_KWH * NH3_MAX_MW
+)
 
 N_HOURS = 24
 
-IDX_ALK = 0
-IDX_PEM = 24
-IDX_NH3 = 48
-IDX_BUY = 72
-IDX_SELL = 96
-IDX_GRID_MODE = 120
-N_VARS = 144
+IDX_R = 0
+IDX_BUY = 24
+IDX_SELL = 48
+IDX_GRID_MODE = 72
+N_VARS = 96
 GRID_BIG_M_MW = 200.0
 
 HOURLY_FIELDS = [
@@ -88,6 +88,7 @@ HOURLY_FIELDS = [
     "P_alk_MW",
     "P_pem_MW",
     "P_nh3_MW",
+    "plant_load_ratio",
     "P_buy_MW",
     "P_sell_MW",
     "P_curtail_MW",
@@ -131,6 +132,7 @@ DAILY_FIELDS = [
     "alk_utilization",
     "pem_utilization",
     "nh3_utilization",
+    "plant_utilization",
     "indicator_class",
 ]
 
@@ -201,17 +203,11 @@ def solve_case(
     upper = np.full(N_VARS, np.inf)
     integrality = np.zeros(N_VARS)
     for hour in range(N_HOURS):
-        c[_var(IDX_ALK, hour)] = 1000.0 * ALK_OPEX_YUAN_PER_KWH
-        c[_var(IDX_PEM, hour)] = 1000.0 * PEM_OPEX_YUAN_PER_KWH
-        c[_var(IDX_NH3, hour)] = 1000.0 * NH3_OPEX_YUAN_PER_KWH * NH3_MW_PER_TPH
+        c[_var(IDX_R, hour)] = 1000.0 * PLANT_OPEX_YUAN_PER_KWH_AT_FULL_LOAD
         c[_var(IDX_BUY, hour)] = 1000.0 * buy_price[hour]
         c[_var(IDX_SELL, hour)] = -1000.0 * SELL_PRICE_YUAN_PER_KWH
-        lower[_var(IDX_ALK, hour)] = ALK_MIN_MW
-        upper[_var(IDX_ALK, hour)] = ALK_MAX_MW
-        lower[_var(IDX_PEM, hour)] = PEM_MIN_MW
-        upper[_var(IDX_PEM, hour)] = PEM_MAX_MW
-        lower[_var(IDX_NH3, hour)] = NH3_MIN_TPH
-        upper[_var(IDX_NH3, hour)] = NH3_MAX_TPH
+        lower[_var(IDX_R, hour)] = MIN_LOAD_RATIO
+        upper[_var(IDX_R, hour)] = 1.0
         upper[_var(IDX_GRID_MODE, hour)] = 1.0
         integrality[_var(IDX_GRID_MODE, hour)] = 1.0
 
@@ -220,17 +216,8 @@ def solve_case(
     a_ub: list[np.ndarray] = []
     b_ub: list[float] = []
     for hour in range(N_HOURS):
-        h2_row = np.zeros(N_VARS)
-        h2_row[_var(IDX_ALK, hour)] = ALK_H2_KG_PER_MWH
-        h2_row[_var(IDX_PEM, hour)] = PEM_H2_KG_PER_MWH
-        h2_row[_var(IDX_NH3, hour)] = -NH3_H2_KG_PER_T
-        a_eq.append(h2_row)
-        b_eq.append(0.0)
-
         power_row = np.zeros(N_VARS)
-        power_row[_var(IDX_ALK, hour)] = 1.0
-        power_row[_var(IDX_PEM, hour)] = 1.0
-        power_row[_var(IDX_NH3, hour)] = NH3_MW_PER_TPH
+        power_row[_var(IDX_R, hour)] = PLANT_MAX_MW
         power_row[_var(IDX_BUY, hour)] = -1.0
         power_row[_var(IDX_SELL, hour)] = 1.0
         a_eq.append(power_row)
@@ -250,7 +237,7 @@ def solve_case(
 
     production_row = np.zeros(N_VARS)
     for hour in range(N_HOURS):
-        production_row[_var(IDX_NH3, hour)] = 1.0
+        production_row[_var(IDX_R, hour)] = NH3_MAX_TPH
     a_eq.append(production_row)
     b_eq.append(target)
 
@@ -270,10 +257,11 @@ def solve_case(
     x = result.x
     hourly_rows: list[dict[str, float | str]] = []
     for hour in range(N_HOURS):
-        p_alk = float(x[_var(IDX_ALK, hour)])
-        p_pem = float(x[_var(IDX_PEM, hour)])
-        nh3_t = float(x[_var(IDX_NH3, hour)])
-        p_nh3 = NH3_MW_PER_TPH * nh3_t
+        plant_load_ratio = float(x[_var(IDX_R, hour)])
+        p_alk = ALK_MAX_MW * plant_load_ratio
+        p_pem = PEM_MAX_MW * plant_load_ratio
+        nh3_t = NH3_MAX_TPH * plant_load_ratio
+        p_nh3 = NH3_MAX_MW * plant_load_ratio
         p_buy = float(x[_var(IDX_BUY, hour)])
         p_sell = float(x[_var(IDX_SELL, hour)])
         h2_prod = ALK_H2_KG_PER_MWH * p_alk + PEM_H2_KG_PER_MWH * p_pem
@@ -299,6 +287,7 @@ def solve_case(
                 "P_alk_MW": _round(p_alk),
                 "P_pem_MW": _round(p_pem),
                 "P_nh3_MW": _round(p_nh3),
+                "plant_load_ratio": _round(plant_load_ratio),
                 "P_buy_MW": _round(p_buy),
                 "P_sell_MW": _round(p_sell),
                 "P_curtail_MW": 0.0,
@@ -374,6 +363,7 @@ def summarize_daily(
         "alk_utilization": _round(e_alk / (ALK_MAX_MW * N_HOURS)),
         "pem_utilization": _round(e_pem / (PEM_MAX_MW * N_HOURS)),
         "nh3_utilization": _round(e_nh3 / (NH3_MAX_MW * N_HOURS)),
+        "plant_utilization": _round(nh3_t / (NH3_MAX_TPH * N_HOURS)),
         "indicator_class": _indicator_class(self_use_ratio, green_ratio, sell_ratio),
     }
 
@@ -488,7 +478,9 @@ def compute() -> tuple[list[dict[str, float | str]], list[dict[str, float | str]
             "pem_MW": PEM_MAX_MW,
             "nh3_MW": NH3_MAX_MW,
             "nh3_tph": NH3_MAX_TPH,
+            "plant_MW": PLANT_MAX_MW,
             "min_load_ratio": MIN_LOAD_RATIO,
+            "dispatch_model": "synchronized_plant_load_ratio",
         },
         "annual_by_production": annual_by_production,
         "annual_recommended": annual_recommended,

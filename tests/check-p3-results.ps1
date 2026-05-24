@@ -15,6 +15,7 @@ $requiredHourlyColumns = @(
     "P_alk_MW",
     "P_pem_MW",
     "P_nh3_MW",
+    "plant_load_ratio",
     "P_buy_MW",
     "P_sell_MW",
     "P_curtail_MW",
@@ -54,6 +55,7 @@ $nonnegativeColumns = @(
     "P_alk_MW",
     "P_pem_MW",
     "P_nh3_MW",
+    "plant_load_ratio",
     "P_buy_MW",
     "P_sell_MW",
     "P_curtail_MW",
@@ -65,6 +67,7 @@ $nonnegativeColumns = @(
 )
 $expectedProduction = @(36, 45, 54, 63, 72)
 $tol = 1e-5
+$syncTol = 1e-4
 
 Write-Host "检查问题三 (p3) 结果结构与基本数值约束..."
 
@@ -178,6 +181,25 @@ foreach ($row in $rows) {
     }
     if ([double]$row.NH3_t -lt 0.3 - 1e-5 -or [double]$row.NH3_t -gt 3.0 + 1e-5) {
         Write-Error "合成氨产量超出 10%-100% 范围: scenario=$($row.scenario_id), target=$($row.target_NH3_t_per_day), hour=$($row.hour)"
+    }
+    $r = [double]$row.plant_load_ratio
+    if ($r -lt 0.1 - 1e-5 -or $r -gt 1.0 + 1e-5) {
+        Write-Error "整套电氢氨装置负荷率超出 10%-100% 范围: scenario=$($row.scenario_id), target=$($row.target_NH3_t_per_day), hour=$($row.hour)"
+    }
+    if ([math]::Abs(([double]$row.P_alk_MW) - 20.0 * $r) -gt $syncTol) {
+        Write-Error "ALK 功率未按统一负荷率同步缩放: scenario=$($row.scenario_id), target=$($row.target_NH3_t_per_day), hour=$($row.hour)"
+    }
+    if ([math]::Abs(([double]$row.P_pem_MW) - 20.0 * $r) -gt $syncTol) {
+        Write-Error "PEM 功率未按统一负荷率同步缩放: scenario=$($row.scenario_id), target=$($row.target_NH3_t_per_day), hour=$($row.hour)"
+    }
+    if ([math]::Abs(([double]$row.P_nh3_MW) - 1.5 * $r) -gt $syncTol) {
+        Write-Error "合成氨装置功率未按统一负荷率同步缩放: scenario=$($row.scenario_id), target=$($row.target_NH3_t_per_day), hour=$($row.hour)"
+    }
+    if ([math]::Abs(([double]$row.NH3_t) - 3.0 * $r) -gt $syncTol) {
+        Write-Error "合成氨产量未按统一负荷率同步缩放: scenario=$($row.scenario_id), target=$($row.target_NH3_t_per_day), hour=$($row.hour)"
+    }
+    if ([math]::Abs(([double]$row.alk_load_ratio) - $r) -gt $syncTol -or [math]::Abs(([double]$row.pem_load_ratio) - $r) -gt $syncTol -or [math]::Abs(([double]$row.nh3_load_ratio) - $r) -gt $syncTol) {
+        Write-Error "ALK/PEM/合成氨负荷率未保持同步: scenario=$($row.scenario_id), target=$($row.target_NH3_t_per_day), hour=$($row.hour)"
     }
     if ([math]::Abs(([double]$row.P_nh3_MW) - 0.5 * ([double]$row.NH3_t)) -gt 1e-5) {
         Write-Error "合成氨功率与产量关系不一致: scenario=$($row.scenario_id), target=$($row.target_NH3_t_per_day), hour=$($row.hour)"
